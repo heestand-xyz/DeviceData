@@ -1,20 +1,17 @@
 import Combine
 
-public protocol DDObject: ObservableObject {
+public protocol DDObject {
     
     associatedtype T
     associatedtype E: DDEngine
     
     var available: Bool { get }
     
-    var authorization: DDAuthorization { get }
-    var authorizationPublisher: Published<DDAuthorization>.Publisher { get }
+    var authorization: CurrentValueSubject<DDAuthorization, Never> { get }
     
-    var active: Bool { get set }
-    var activePublisher: Published<Bool>.Publisher { get }
+    var active: CurrentValueSubject<Bool, Never> { get set }
     
     init(engine: E)
     
-    var value: T? { get }
-    var valuePublisher: Published<T?>.Publisher { get }
+    var data: CurrentValueSubject<T?, Never> { get }
 }

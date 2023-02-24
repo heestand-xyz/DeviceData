@@ -1,42 +1,42 @@
 import Combine
 import CoreMotion
 
-public final class DDAccelerometer: DDObject {
+public final class DDAccelerometer<E: DDMotionEngine>: DDObject {
     
     public var available: Bool {
-        motionEngine.manager.isAccelerometerAvailable
+        motionEngine.isAccelerometerAvailable
     }
     
-    @Published public var authorization: DDAuthorization = .notAvailable
-    public var authorizationPublisher: Published<DDAuthorization>.Publisher { $authorization }
+    public var authorization: CurrentValueSubject<DDAuthorization, Never> = .init(.notAvailable)
     
-    @Published public var active: Bool = false {
-        didSet {
-            guard available else { return }
-            if active {
-                motionEngine.manager.startAccelerometerUpdates()
-            } else {
-                motionEngine.manager.stopAccelerometerUpdates()
-                value = nil
-            }
-        }
-    }
-    public var activePublisher: Published<Bool>.Publisher { $active }
+    public var active: CurrentValueSubject<Bool, Never> = .init(false)
+
+    public var data: CurrentValueSubject<SIMD3<Double>?, Never> = .init(nil)
     
-    @Published public var value: CMAccelerometerData?
-    public var valuePublisher: Published<CMAccelerometerData?>.Publisher { $value }
-    
-    let motionEngine: DDMotionEngine
+    let motionEngine: E
     
     private var cancelBag: Set<AnyCancellable> = []
     
-    public init(engine: DDMotionEngine) {
+    public init(engine: E) {
         
         motionEngine = engine
         
-        motionEngine.manager.accelerometerData.publisher
-            .map { $0 }
-            .assign(to: \.value, on: self)
+        motionEngine.accelerometerDataPassthroughSubject
+            .sink { [weak self] value in
+                self?.data.value = value
+            }
+            .store(in: &cancelBag)
+        
+        active
+            .sink { [weak self] active in
+                guard let self, available else { return }
+                if active {
+                    motionEngine.startAccelerometerUpdates()
+                } else {
+                    motionEngine.stopAccelerometerUpdates()
+                    data.value = nil
+                }
+            }
             .store(in: &cancelBag)
     }
 }
