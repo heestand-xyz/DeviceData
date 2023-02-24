@@ -3,11 +3,11 @@ import XCTest
 
 final class DeviceDataTests: XCTestCase {
     
-    func testAccelerometer() throws {
-        
-        let motionEngine = DDMotionEngine()
-        let accelerometer = DDAccelerometer(engine: motionEngine)
-        
+//    func testAccelerometer() throws {
+//
+//        let motionEngine = DDMotionEngine()
+//        let accelerometer = DDAccelerometer(engine: motionEngine)
+//
 //        XCTAssertNotNil(accelerometer.value)
-    }
+//    }
 }

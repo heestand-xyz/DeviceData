@@ -1,13 +1,17 @@
-import Foundation
+import Combine
 
 public protocol DDObject: ObservableObject {
     
     associatedtype T
     associatedtype E: DDEngine
-   
-    var authorization: DDAuthorization { get }
+    
     var available: Bool { get }
+    
+    var authorization: DDAuthorization { get }
+    var authorizationPublisher: Published<DDAuthorization>.Publisher { get }
+    
     var active: Bool { get set }
+    var activePublisher: Published<Bool>.Publisher { get }
     
     init(engine: E)
     
