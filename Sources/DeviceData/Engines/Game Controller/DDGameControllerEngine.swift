@@ -22,64 +22,58 @@ public class DDGameControllerEngine: DDEngine {
 
     @objc private func controllerConnected(notification: NSNotification) {
         
-        print("Device Data - Game Controller - Connected")
-        
         controller = notification.object as? GCController
         
         isConnected.value = controller != nil
         
         gamePad.value = .init(.off)
         
-        controller?.extendedGamepad?.valueChangedHandler = { [weak self] (gamepad, gameElement) in
+        controller?.extendedGamepad?.valueChangedHandler = { [weak self] (controller, _) in
             
             guard let self, active else { return }
             
-            guard let alias: String = gameElement.aliases.first else { return }
+            var gamePad: DDGamePad = gamePad.value ?? .off
             
-            print("Device Data - Game Controller - Alias:", alias)
+            gamePad.home = controller.buttonHome?.isPressed == true
+            gamePad.menu = controller.buttonMenu.isPressed
+            gamePad.options = controller.buttonOptions?.isPressed == true
             
-            if let gameButton = gameElement as? GCControllerButtonInput {
+            gamePad.action.left = controller.buttonX.isPressed
+            gamePad.action.down = controller.buttonA.isPressed
+            gamePad.action.up = controller.buttonY.isPressed
+            gamePad.action.right = controller.buttonB.isPressed
             
-                if alias.contains("Trigger") {
+            gamePad.leftStick = DDGamePad.Sick(x: CGFloat(controller.leftThumbstick.xAxis.value),
+                                               y: CGFloat(controller.leftThumbstick.yAxis.value),
+                                               active: controller.leftThumbstickButton?.isPressed == true)
             
-                }
+            gamePad.rightStick = DDGamePad.Sick(x: CGFloat(controller.rightThumbstick.xAxis.value),
+                                                y: CGFloat(controller.rightThumbstick.yAxis.value),
+                                                active: controller.rightThumbstickButton?.isPressed == true)
+            
+            gamePad.leftShoulder = controller.leftShoulder.isPressed
+            gamePad.leftShoulder = controller.rightShoulder.isPressed
+            
+            gamePad.leftTrigger = CGFloat(controller.leftTrigger.value)
+            gamePad.rightTrigger = CGFloat(controller.rightTrigger.value)
+            
+            gamePad.dpad = DDGamePad.DPad(left: controller.dpad.left.isPressed,
+                                          right: controller.dpad.right.isPressed,
+                                          up: controller.dpad.up.isPressed,
+                                          down: controller.dpad.down.isPressed)
+            
+            if let touchpad = controller.touchpads.sorted(by: { $0.key < $1.key }).first?.value {
+                gamePad.touchPad = DDGamePad.TouchPad(x: CGFloat(touchpad.touchSurface.xAxis.value),
+                                                      y: CGFloat(touchpad.touchSurface.yAxis.value),
+                                                      active: touchpad.button.isPressed)
                 
-            } else if let gamePad = gameElement as? GCControllerDirectionPad {
-                
-                let x: CGFloat = CGFloat(gamePad.xAxis.value)
-                let y: CGFloat = CGFloat(gamePad.yAxis.value)
-            
-                if alias == "Direction Pad" {
-                    
-                    switch (x, y) {
-                    case (-1.0, 0.0):
-                        break
-                    case (1.0, 0.0):
-                        break
-                    case (0.0, 1.0):
-                        break
-                    case (0.0, -1.0):
-                        break
-                    default:
-                        break
-                    }
-                    
-                } else if alias.contains("Touchpad") {
-                    
-                    if x != 0.0 || y != 0.0 {
-                        
-                    } else {
-                        
-                    }
-                }
             }
+            
+            self.gamePad.value = gamePad
         }
     }
 
     @objc private func controllerDisconnected(notification: NSNotification) {
-        
-        print("Device Data - Game Controller - Disconnected")
-        
         controller = nil
         isConnected.value = false
         gamePad.value = nil

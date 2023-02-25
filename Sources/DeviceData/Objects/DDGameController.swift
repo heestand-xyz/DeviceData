@@ -27,5 +27,9 @@ public final class DDGameController: DDObject {
         engine.isConnected
             .assign(to: \.connected.value, on: self)
             .store(in: &cancelBag)
+        
+        engine.gamePad
+            .assign(to: \.data.value, on: self)
+            .store(in: &cancelBag)
     }
 }
