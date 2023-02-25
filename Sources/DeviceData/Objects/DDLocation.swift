@@ -22,9 +22,9 @@ public final class DDLocation: DDObject {
         active
             .sink { [weak self] active in
                 if active {
-                    self?.engine.startRequestingLocation()
+                    self?.engine.startUpdatingLocation()
                 } else {
-                    self?.engine.stopRequestingLocation()
+                    self?.engine.stopUpdatingLocation()
                 }
             }
             .store(in: &cancelBag)
