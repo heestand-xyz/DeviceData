@@ -21,12 +21,6 @@ public final class DDAccelerometer<E: DDMotionEngine>: DDObject {
         
         motionEngine = engine
         
-        motionEngine.accelerometerDataPassthroughSubject
-            .sink { [weak self] value in
-                self?.data.value = value
-            }
-            .store(in: &cancelBag)
-        
         active
             .sink { [weak self] active in
                 guard let self, available else { return }
@@ -36,6 +30,12 @@ public final class DDAccelerometer<E: DDMotionEngine>: DDObject {
                     motionEngine.stopAccelerometerUpdates()
                     data.value = nil
                 }
+            }
+            .store(in: &cancelBag)
+        
+        motionEngine.accelerometerDataPassthroughSubject
+            .sink { [weak self] value in
+                self?.data.value = value
             }
             .store(in: &cancelBag)
     }
