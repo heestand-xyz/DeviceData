@@ -11,26 +11,19 @@ public final class DDRealMotionEngine: DDMotionEngine {
     
     let manager: CMMotionManager
     
-    private var updateCancelBag: Set<AnyCancellable> = []
-    
     public init() {
         manager = CMMotionManager()
     }
     
     public func startAccelerometerUpdates() {
-        manager.startAccelerometerUpdates()
-        manager.accelerometerData.publisher
-            .map { data in
-                SIMD3(data.acceleration.x, data.acceleration.y, data.acceleration.z)
-            }
-            .sink(receiveValue: { [weak self] value in
-                self?.accelerometerDataPassthroughSubject.send(value)
-            })
-            .store(in: &updateCancelBag)
+        manager.startAccelerometerUpdates(to: .main) { [weak self] data, error in
+            guard let self, error == nil, let data else { return }
+            let vector = SIMD3(data.acceleration.x, data.acceleration.y, data.acceleration.z)
+            accelerometerDataPassthroughSubject.send(vector)
+        }
     }
     
     public func stopAccelerometerUpdates() {
-        updateCancelBag = []
         manager.stopAccelerometerUpdates()
     }
 }
