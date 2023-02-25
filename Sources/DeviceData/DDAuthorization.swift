@@ -1,5 +1,5 @@
 public enum DDAuthorization {
-    case notAvailable
+    case notNeeded
     case unauthorized
     case authorized
 }

@@ -7,7 +7,7 @@ public final class DDAccelerometer<E: DDMotionEngine>: DDObject {
         motionEngine.isAccelerometerAvailable
     }
     
-    public var authorization: CurrentValueSubject<DDAuthorization, Never> = .init(.notAvailable)
+    public var authorization: CurrentValueSubject<DDAuthorization, Never> = .init(.notNeeded)
     
     public var active: CurrentValueSubject<Bool, Never> = .init(false)
 

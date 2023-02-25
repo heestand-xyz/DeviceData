@@ -7,7 +7,7 @@ public final class DDGyroscope<E: DDMotionEngine>: DDObject {
         motionEngine.isGyroscopeAvailable
     }
     
-    public var authorization: CurrentValueSubject<DDAuthorization, Never> = .init(.notAvailable)
+    public var authorization: CurrentValueSubject<DDAuthorization, Never> = .init(.notNeeded)
     
     public var active: CurrentValueSubject<Bool, Never> = .init(false)
 
