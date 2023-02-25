@@ -14,4 +14,6 @@ public protocol DDObject {
     init(engine: E)
     
     var data: CurrentValueSubject<T?, Never> { get }
+    
+    func authorize()
 }

@@ -32,4 +32,6 @@ public final class DDGameController: DDObject {
             .assign(to: \.data.value, on: self)
             .store(in: &cancelBag)
     }
+    
+    public func authorize() {}
 }

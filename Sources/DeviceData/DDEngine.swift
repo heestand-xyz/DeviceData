@@ -1,1 +1,3 @@
-public protocol DDEngine {}
+public protocol DDEngine {
+    init()
+}

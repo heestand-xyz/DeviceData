@@ -39,4 +39,6 @@ public final class DDAccelerometer<E: DDMotionEngine>: DDObject {
             }
             .store(in: &cancelBag)
     }
+    
+    public func authorize() {}
 }

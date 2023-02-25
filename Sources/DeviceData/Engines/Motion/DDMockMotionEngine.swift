@@ -15,7 +15,7 @@ public final class DDMockMotionEngine: DDMotionEngine {
     private var accelerometerLastData: SIMD3<Double> = .zero
     private var gyroscopeLastData: SIMD3<Double> = .zero
     
-    init() {}
+    public init() {}
     
     public func startAccelerometerUpdates() {
         accelerometerUpdateTimer = .scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] _ in

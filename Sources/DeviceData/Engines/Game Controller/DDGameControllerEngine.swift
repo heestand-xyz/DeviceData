@@ -1,7 +1,7 @@
 import Combine
 import GameController
 
-public class DDGameControllerEngine: DDEngine {
+public final class DDGameControllerEngine: DDEngine {
 
     var active: Bool = false
     
