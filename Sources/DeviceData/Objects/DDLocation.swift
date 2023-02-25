@@ -19,6 +19,16 @@ public final class DDLocation: DDObject {
         
         self.engine = engine
         
+        active
+            .sink { [weak self] active in
+                if active {
+                    self?.engine.startRequestingLocation()
+                } else {
+                    self?.engine.stopRequestingLocation()
+                }
+            }
+            .store(in: &cancelBag)
+        
         engine.authorization
             .sink { [weak self] status in
                 guard let self else { return }

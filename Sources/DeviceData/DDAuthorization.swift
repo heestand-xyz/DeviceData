@@ -7,3 +7,9 @@ public enum DDAuthorization {
     case authorizedAlways
     case unknown
 }
+
+extension DDAuthorization {
+    public var authorized: Bool {
+        [.authorizedAlways, .authorizedWhenInUse].contains(self)
+    }
+}

@@ -19,6 +19,9 @@ public final class DDLocationEngine: NSObject, DDEngine {
         super.init()
         
         manager.delegate = self
+        
+//        manager.pausesLocationUpdatesAutomatically = false
+//        manager.allowsBackgroundLocationUpdates = true
     }
     
     func authorize() {
