@@ -3,13 +3,6 @@ public enum DDAuthorization {
     case notDetermined
     case restricted
     case denied
-    case authorizedWhenInUse
-    case authorizedAlways
+    case authorized
     case unknown
-}
-
-extension DDAuthorization {
-    public var authorized: Bool {
-        [.authorizedAlways, .authorizedWhenInUse].contains(self)
-    }
 }
