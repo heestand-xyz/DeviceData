@@ -36,7 +36,6 @@ public struct DDGamePad {
         public var active: Bool
     }
     public var touchPad: TouchPad
-    public var touchPadButton: Bool
     
     public var leftShoulder: Bool
     public var rightShoulder: Bool
@@ -45,6 +44,38 @@ public struct DDGamePad {
 }
 
 extension DDGamePad {
+
+    public func values() -> [String: Any] {
+         [
+            "home": home,
+            "menu": menu,
+            "options": options,
+            "dpad/left": dpad.left,
+            "dpad/right": dpad.right,
+            "dpad/down": dpad.down,
+            "dpad/up": dpad.up,
+            "action/left": action.left,
+            "action/right": action.right,
+            "action/down": action.down,
+            "action/up": action.up,
+            "stick/left/x": leftStick.x,
+            "stick/left/y": leftStick.y,
+            "stick/left/active": leftStick.active,
+            "stick/right/x": rightStick.x,
+            "stick/right/y": rightStick.y,
+            "stick/right/active": rightStick.active,
+            "touchpad/x": touchPad.x,
+            "touchpad/y": touchPad.y,
+            "touchpad/active": touchPad.active,
+            "shoulder/left": leftShoulder,
+            "shoulder/right": rightShoulder,    
+            "trigger/left": leftTrigger,
+            "trigger/right": rightTrigger,
+        ]
+    }
+}
+
+extension DDGamePad {
     
-    static let off = DDGamePad(home: false, menu: false, options: false, dpad: DPad(left: false, right: false, up: false, down: false), action: Action(left: false, right: false, up: false, down: false), leftStick: Sick(x: 0.0, y: 0.0, active: false), rightStick: Sick(x: 0.0, y: 0.0, active: false), touchPad: TouchPad(x: 0.0, y: 0.0, active: false), touchPadButton: false, leftShoulder: false, rightShoulder: false, leftTrigger: 0.0, rightTrigger: 0.0)
+    static let off = DDGamePad(home: false, menu: false, options: false, dpad: DPad(left: false, right: false, up: false, down: false), action: Action(left: false, right: false, up: false, down: false), leftStick: Sick(x: 0.0, y: 0.0, active: false), rightStick: Sick(x: 0.0, y: 0.0, active: false), touchPad: TouchPad(x: 0.0, y: 0.0, active: false), leftShoulder: false, rightShoulder: false, leftTrigger: 0.0, rightTrigger: 0.0)
 }

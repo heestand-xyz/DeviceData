@@ -9,7 +9,7 @@ public final class DDLocation: DDObject {
     
     public var active: CurrentValueSubject<Bool, Never> = .init(false)
     
-    public var data: CurrentValueSubject<CLLocationCoordinate2D?, Never> = .init(nil)
+    public var data: CurrentValueSubject<CLLocation?, Never> = .init(nil)
     
     private let engine: DDLocationEngine
     
@@ -49,7 +49,7 @@ public final class DDLocation: DDObject {
             }
             .store(in: &cancelBag)
         
-        engine.coordinate
+        engine.location
             .map { $0 }
             .assign(to: \.data.value, on: self)
             .store(in: &cancelBag)

@@ -5,7 +5,7 @@ public final class DDLocationEngine: NSObject, DDEngine {
     
     private let manager: CLLocationManager
     
-    public var coordinate: PassthroughSubject<CLLocationCoordinate2D, Never> = .init()
+    public var location: PassthroughSubject<CLLocation, Never> = .init()
     public var heading: PassthroughSubject<CLHeading, Never> = .init()
     
     public var authorization: CurrentValueSubject<CLAuthorizationStatus, Never>
@@ -53,8 +53,8 @@ extension DDLocationEngine: CLLocationManagerDelegate {
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let coordinate = locations.first?.coordinate else { return }
-        self.coordinate.send(coordinate)
+        guard let location = locations.first else { return }
+        self.location.send(location)
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
