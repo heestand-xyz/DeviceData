@@ -30,9 +30,9 @@ public final class DDGameControllerEngine: DDEngine {
         
         controller?.extendedGamepad?.valueChangedHandler = { [weak self] (controller, _) in
             
-            guard let self, active else { return }
+            guard let self, self.active else { return }
             
-            var gamePad: DDGamePad = gamePad.value ?? .off
+            var gamePad: DDGamePad = self.gamePad.value ?? .off
             
             gamePad.home = controller.buttonHome?.isPressed == true
             gamePad.menu = controller.buttonMenu.isPressed

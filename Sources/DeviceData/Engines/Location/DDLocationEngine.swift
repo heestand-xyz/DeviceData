@@ -26,7 +26,7 @@ public final class DDLocationEngine: NSObject, DDEngine {
     }
     
     func authorize() {
-        manager.requestAlwaysAuthorization()
+        manager.requestWhenInUseAuthorization()
     }
     
     func startUpdatingLocation() {

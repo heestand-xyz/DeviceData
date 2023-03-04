@@ -23,7 +23,7 @@ public final class DDRealMotionEngine: DDMotionEngine {
         manager.startAccelerometerUpdates(to: .main) { [weak self] data, error in
             guard let self, error == nil, let data else { return }
             let vector = SIMD3(data.acceleration.x, data.acceleration.y, data.acceleration.z)
-            accelerometerDataPassthroughSubject.send(vector)
+            self.accelerometerDataPassthroughSubject.send(vector)
         }
     }
     
@@ -35,7 +35,7 @@ public final class DDRealMotionEngine: DDMotionEngine {
         manager.startGyroUpdates(to: .main) { [weak self] data, error in
             guard let self, error == nil, let data else { return }
             let vector = SIMD3(data.rotationRate.x, data.rotationRate.y, data.rotationRate.z)
-            gyroscopeDataPassthroughSubject.send(vector)
+            self.gyroscopeDataPassthroughSubject.send(vector)
         }
     }
     

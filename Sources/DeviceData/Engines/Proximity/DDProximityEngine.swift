@@ -35,15 +35,15 @@ public final class DDProximityEngine: DDEngine {
             .sink { [weak self] active in
                 guard let self else { return }
                 if active {
-                    enabled = true
+                    self.enabled = true
                     NotificationCenter.default.addObserver(
                         self,
-                        selector: #selector(proximityStateChange),
+                        selector: #selector(self.proximityStateChange),
                         name: UIDevice.proximityStateDidChangeNotification,
                         object: nil
                     )
                 } else {
-                    enabled = false
+                    self.enabled = false
                     NotificationCenter.default.removeObserver(self)
                 }
             }

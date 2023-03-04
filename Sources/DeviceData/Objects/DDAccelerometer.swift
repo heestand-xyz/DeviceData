@@ -23,12 +23,12 @@ public final class DDAccelerometer<E: DDMotionEngine>: DDObject {
         
         active
             .sink { [weak self] active in
-                guard let self, available else { return }
+                guard let self, self.available else { return }
                 if active {
-                    motionEngine.startAccelerometerUpdates()
+                    self.motionEngine.startAccelerometerUpdates()
                 } else {
-                    motionEngine.stopAccelerometerUpdates()
-                    data.value = nil
+                    self.motionEngine.stopAccelerometerUpdates()
+                    self.data.value = nil
                 }
             }
             .store(in: &cancelBag)

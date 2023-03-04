@@ -23,12 +23,12 @@ public final class DDGyroscope<E: DDMotionEngine>: DDObject {
         
         active
             .sink { [weak self] active in
-                guard let self, available else { return }
+                guard let self, self.available else { return }
                 if active {
-                    motionEngine.startGyroscopeUpdates()
+                    self.motionEngine.startGyroscopeUpdates()
                 } else {
-                    motionEngine.stopGyroscopeUpdates()
-                    data.value = nil
+                    self.motionEngine.stopGyroscopeUpdates()
+                    self.data.value = nil
                 }
             }
             .store(in: &cancelBag)

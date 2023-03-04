@@ -27,9 +27,9 @@ public final class DDFaceTracking: DDObject {
                 guard let self else { return }
                 if active {
                     engine.start()
-                    session.value = engine.session
+                    self.session.value = engine.session
                 } else {
-                    session.value = nil
+                    self.session.value = nil
                     engine.stop()
                 }
             }
