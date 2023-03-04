@@ -38,10 +38,10 @@ public final class DDGameControllerEngine: DDEngine {
             gamePad.menu = controller.buttonMenu.isPressed
             gamePad.options = controller.buttonOptions?.isPressed == true
             
-            gamePad.action.left = controller.buttonX.isPressed
-            gamePad.action.down = controller.buttonA.isPressed
-            gamePad.action.up = controller.buttonY.isPressed
-            gamePad.action.right = controller.buttonB.isPressed
+            gamePad.action = DDGamePad.Arrows(left: controller.buttonX.isPressed,
+                                              right: controller.buttonB.isPressed,
+                                              up: controller.buttonY.isPressed,
+                                              down: controller.buttonA.isPressed)
             
             gamePad.leftStick = DDGamePad.Sick(x: CGFloat(controller.leftThumbstick.xAxis.value),
                                                y: CGFloat(controller.leftThumbstick.yAxis.value),
@@ -52,15 +52,15 @@ public final class DDGameControllerEngine: DDEngine {
                                                 active: controller.rightThumbstickButton?.isPressed == true)
             
             gamePad.leftShoulder = controller.leftShoulder.isPressed
-            gamePad.leftShoulder = controller.rightShoulder.isPressed
+            gamePad.rightShoulder = controller.rightShoulder.isPressed
             
             gamePad.leftTrigger = CGFloat(controller.leftTrigger.value)
             gamePad.rightTrigger = CGFloat(controller.rightTrigger.value)
             
-            gamePad.dpad = DDGamePad.DPad(left: controller.dpad.left.isPressed,
-                                          right: controller.dpad.right.isPressed,
-                                          up: controller.dpad.up.isPressed,
-                                          down: controller.dpad.down.isPressed)
+            gamePad.dpad = DDGamePad.Arrows(left: controller.dpad.left.isPressed,
+                                            right: controller.dpad.right.isPressed,
+                                            up: controller.dpad.up.isPressed,
+                                            down: controller.dpad.down.isPressed)
             
             if let touchpad = controller.touchpads.sorted(by: { $0.key < $1.key }).first?.value {
                 gamePad.touchPad = DDGamePad.TouchPad(x: CGFloat(touchpad.touchSurface.xAxis.value),
