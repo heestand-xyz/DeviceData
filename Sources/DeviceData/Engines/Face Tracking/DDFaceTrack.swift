@@ -1,6 +1,7 @@
 import ARKit
 import SceneKit
 import simd
+import OrderedCollections
 
 public struct DDFaceTrack {
     
@@ -10,8 +11,8 @@ public struct DDFaceTrack {
 
 extension DDFaceTrack {
     
-    public static var defaultActive: [String: Bool] = {
-        var keys: [String: Bool] = [:]
+    public static let defaultActive: OrderedDictionary<String, Bool> = {
+        var keys: OrderedDictionary<String, Bool> = [:]
         for key in matrixKeys.map({ "camera/\($0)" }) { keys[key] = true }
         for key in matrixKeys.map({ "face/\($0)" }) { keys[key] = true }
         for key in matrixKeys.map({ "eye/left/\($0)" }) { keys[key] = false }

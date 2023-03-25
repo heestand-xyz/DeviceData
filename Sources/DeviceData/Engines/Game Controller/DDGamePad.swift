@@ -1,4 +1,5 @@
 import CoreGraphics
+import OrderedCollections
 
 public struct DDGamePad {
     
@@ -37,6 +38,33 @@ public struct DDGamePad {
 }
 
 extension DDGamePad {
+
+    public static let defaultActive: OrderedDictionary<String, Bool> = [
+        "home": true,
+        "menu": true,
+        "options": true,
+        "dpad/left": true,
+        "dpad/right": true,
+        "dpad/down": true,
+        "dpad/up": true,
+        "action/left": true,
+        "action/right": true,
+        "action/down": true,
+        "action/up": true,
+        "stick/left/x": true,
+        "stick/left/y": true,
+        "stick/left/active": true,
+        "stick/right/x": true,
+        "stick/right/y": true,
+        "stick/right/active": true,
+        "shoulder/left": true,
+        "shoulder/right": true,
+        "trigger/left": true,
+        "trigger/right": true,
+        "touchpad/x": false,
+        "touchpad/y": false,
+        "touchpad/active": false,
+    ]
 
     public func values() -> [String: Any] {
          [

@@ -10,10 +10,15 @@ let package = Package(
             name: "DeviceData",
             targets: ["DeviceData"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-collections", from: "1.0.4"),
+    ],
     targets: [
         .target(
             name: "DeviceData",
-            dependencies: []),
+            dependencies: [
+                .product(name: "Collections", package: "swift-collections"),
+            ]),
         .testTarget(
             name: "DeviceDataTests",
             dependencies: ["DeviceData"])
