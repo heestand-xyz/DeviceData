@@ -10,6 +10,68 @@ public struct DDFaceTrack {
 
 extension DDFaceTrack {
     
+    public static var defaultActive: [String: Bool] = {
+        var keys: [String: Bool] = [:]
+        for key in matrixKeys.map({ "camera/\($0)" }) { keys[key] = true }
+        for key in matrixKeys.map({ "face/\($0)" }) { keys[key] = true }
+        for key in matrixKeys.map({ "eye/left/\($0)" }) { keys[key] = false }
+        for key in matrixKeys.map({ "eye/right/\($0)" }) { keys[key] = false }
+        for key in ["x", "y", "z"].map({ "lookAt/\($0)" }) { keys[key] = false }
+        keys["blendShape/browDownLeft"] = false
+        keys["blendShape/browDownRight"] = false
+        keys["blendShape/browInnerUp"] = false
+        keys["blendShape/browOuterUpLeft"] = false
+        keys["blendShape/browOuterUpRight"] = false
+        keys["blendShape/cheekPuff"] = false
+        keys["blendShape/cheekSquintLeft"] = false
+        keys["blendShape/cheekSquintRight"] = false
+        keys["blendShape/eyeBlinkLeft"] = false
+        keys["blendShape/eyeBlinkRight"] = false
+        keys["blendShape/eyeLookDownLeft"] = false
+        keys["blendShape/eyeLookDownRight"] = false
+        keys["blendShape/eyeLookInLeft"] = false
+        keys["blendShape/eyeLookInRight"] = false
+        keys["blendShape/eyeLookOutLeft"] = false
+        keys["blendShape/eyeLookOutRight"] = false
+        keys["blendShape/eyeLookUpLeft"] = false
+        keys["blendShape/eyeLookUpRight"] = false
+        keys["blendShape/eyeSquintLeft"] = false
+        keys["blendShape/eyeSquintRight"] = false
+        keys["blendShape/eyeWideLeft"] = false
+        keys["blendShape/eyeWideRight"] = false
+        keys["blendShape/jawForward"] = false
+        keys["blendShape/jawLeft"] = false
+        keys["blendShape/jawOpen"] = false
+        keys["blendShape/jawRight"] = false
+        keys["blendShape/mouthClose"] = false
+        keys["blendShape/mouthDimpleLeft"] = false
+        keys["blendShape/mouthDimpleRight"] = false
+        keys["blendShape/mouthFrownLeft"] = false
+        keys["blendShape/mouthFrownRight"] = false
+        keys["blendShape/mouthFunnel"] = false
+        keys["blendShape/mouthLeft"] = false
+        keys["blendShape/mouthLowerDownLeft"] = false
+        keys["blendShape/mouthLowerDownRight"] = false
+        keys["blendShape/mouthPressLeft"] = false
+        keys["blendShape/mouthPressRight"] = false
+        keys["blendShape/mouthPucker"] = false
+        keys["blendShape/mouthRight"] = false
+        keys["blendShape/mouthRollLower"] = false
+        keys["blendShape/mouthRollUpper"] = false
+        keys["blendShape/mouthShrugLower"] = false
+        keys["blendShape/mouthShrugUpper"] = false
+        keys["blendShape/mouthSmileLeft"] = false
+        keys["blendShape/mouthSmileRight"] = false
+        keys["blendShape/mouthStretchLeft"] = false
+        keys["blendShape/mouthStretchRight"] = false
+        keys["blendShape/mouthUpperUpLeft"] = false
+        keys["blendShape/mouthUpperUpRight"] = false
+        keys["blendShape/noseSneerLeft"] = false
+        keys["blendShape/noseSneerRight"] = false
+        keys["blendShape/tongueOut"] = false
+        return keys
+    }()
+    
     public func values() -> [String: CGFloat] {
         
         var allValues: [String : CGFloat] = [:]
@@ -75,25 +137,25 @@ extension DDFaceTrack {
                 allValues[key] = CGFloat(value.floatValue)
             }
             
-            allValues["faceAnchor/lookAtPoint/x"] = CGFloat(faceAnchor.lookAtPoint.x)
-            allValues["faceAnchor/lookAtPoint/y"] = CGFloat(faceAnchor.lookAtPoint.y)
-            allValues["faceAnchor/lookAtPoint/z"] = CGFloat(faceAnchor.lookAtPoint.z)
+            allValues["lookAt/x"] = CGFloat(faceAnchor.lookAtPoint.x)
+            allValues["lookAt/y"] = CGFloat(faceAnchor.lookAtPoint.y)
+            allValues["lookAt/z"] = CGFloat(faceAnchor.lookAtPoint.z)
             
             for (key, value) in values(matrix: faceAnchor.leftEyeTransform) {
-                allValues["faceAnchor/leftEye/\(key)"] = value
+                allValues["eye/left/\(key)"] = value
             }
-
+            
             for (key, value) in values(matrix: faceAnchor.rightEyeTransform) {
-                allValues["faceAnchor/rightEye/\(key)"] = value
+                allValues["eye/right/\(key)"] = value
             }
             
             for (key, value) in values(matrix: faceAnchor.transform) {
-                allValues["faceAnchor/\(key)"] = value
+                allValues["face/\(key)"] = value
             }
         }
         
         if let cameraTransform {
-        
+            
             for (key, value) in values(matrix: simd_float4x4(cameraTransform)) {
                 allValues["camera/\(key)"] = value
             }
@@ -101,6 +163,9 @@ extension DDFaceTrack {
         
         return allValues
     }
+}
+
+extension DDFaceTrack {
     
     private func values(matrix: simd_float4x4) -> [String: CGFloat] {
         
@@ -119,4 +184,14 @@ extension DDFaceTrack {
         
         return values
     }
+    
+    static let matrixKeys: [String] = [
+        "position/x",
+        "position/y",
+        "position/z",
+        "rotation/x",
+        "rotation/y",
+        "rotation/z",
+        "rotation/w",
+    ]
 }
