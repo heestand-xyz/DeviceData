@@ -11,27 +11,26 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
     public var audio: PassthroughSubject<DDAudio, Never> = .init()
     
     public var authorization: CurrentValueSubject<AVAuthorizationStatus, Never>
-    
+//    public var authorization: CurrentValueSubject<DDAuthorization, Never>
+
     public override init() {
 
-        let url: URL = Bundle.main.bundleURL.appending(path: "audio_\(UUID().uuidString)")
+        let url: URL = FileManager.default.temporaryDirectory
+            .appending(path: "audio_\(UUID().uuidString).m4a")
         self.url = url
         
         recorder = try? AVAudioRecorder(url: url, settings: [:])
         
         authorization = .init(AVCaptureDevice.authorizationStatus(for: .audio))
+//        if #available(iOS 17.0, *) {
+//            authorization = .init(AudioAuth.authorization())
+//        } else {
+//            authorization = .init(.unknown)
+//        }
 
         super.init()
         
         try? AVAudioSession.sharedInstance().setCategory(.record)
-    }
-    
-    deinit {
-        recorder?.stop()
-        recorder?.deleteRecording()
-        if let path = url?.path(percentEncoded: false) {
-            try? FileManager.default.removeItem(atPath: path)
-        }
     }
     
     func authorize() {
@@ -40,6 +39,14 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
                 self?.authorization.value = AVCaptureDevice.authorizationStatus(for: .audio)
             }
         }
+//        if #available(iOS 17.0, *) {
+//            Task {
+//                await AudioAuth.authorize()
+//                await MainActor.run {
+//                    authorization.value = AudioAuth.authorization()
+//                }
+//            }
+//        }
     }
     
     func startUpdating() {
@@ -56,8 +63,30 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
     }
     
     func stopUpdating() {
-        recorder?.pause()
+        recorder?.stop()
+        recorder?.deleteRecording()
         timer?.invalidate()
         timer = nil
     }
+    
+//    @available(iOS 17.0, *)
+//    struct AudioAuth {
+//        
+//        static func authorize() async {
+//            await AVAudioApplication.requestRecordPermission()
+//        }
+//        
+//        static func authorization() -> DDAuthorization {
+//            switch AVAudioApplication.shared.recordPermission {
+//            case .undetermined:
+//                return .notDetermined
+//            case .denied:
+//                return .denied
+//            case .granted:
+//                return .authorized
+//            @unknown default:
+//                return .unknown
+//            }
+//        }
+//    }
 }
