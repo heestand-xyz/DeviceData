@@ -22,6 +22,8 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
         authorization = .init(AVCaptureDevice.authorizationStatus(for: .audio))
 
         super.init()
+        
+        try? AVAudioSession.sharedInstance().setCategory(.record)
     }
     
     deinit {
@@ -41,7 +43,6 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
     }
     
     func startUpdating() {
-        try? AVAudioSession.sharedInstance().setCategory(.playAndRecord)
         guard recorder?.prepareToRecord() == true else { return }
         recorder?.isMeteringEnabled = true
         recorder?.record()
