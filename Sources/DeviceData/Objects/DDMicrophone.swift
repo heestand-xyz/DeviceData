@@ -47,7 +47,7 @@ public final class DDMicrophone: DDObject {
             }
             .store(in: &cancelBag)
         
-        engine.amplitude
+        engine.audio
             .map { $0 }
             .assign(to: \.data.value, on: self)
             .store(in: &cancelBag)
