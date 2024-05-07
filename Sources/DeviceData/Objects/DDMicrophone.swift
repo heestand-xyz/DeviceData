@@ -1,7 +1,6 @@
 import Combine
 import CoreGraphics
 
-@available(iOS 17.0, *)
 public final class DDMicrophone: DDObject {
     
     public var available: Bool { true }
@@ -10,7 +9,7 @@ public final class DDMicrophone: DDObject {
     
     public var active: CurrentValueSubject<Bool, Never> = .init(false)
     
-    public var data: CurrentValueSubject<CGFloat?, Never> = .init(nil)
+    public var data: CurrentValueSubject<DDAudio?, Never> = .init(nil)
     
     private let engine: DDMicrophoneEngine
     
@@ -34,12 +33,14 @@ public final class DDMicrophone: DDObject {
             .sink { [weak self] status in
                 guard let self else { return }
                 switch status {
-                case .granted:
-                    self.authorization.value = .authorized
+                case .notDetermined:
+                    self.authorization.value = .notDetermined
+                case .restricted:
+                    self.authorization.value = .restricted
                 case .denied:
                     self.authorization.value = .denied
-                case .undetermined:
-                    self.authorization.value = .notDetermined
+                case .authorized:
+                    self.authorization.value = .authorized
                 @unknown default:
                     self.authorization.value = .unknown
                 }
