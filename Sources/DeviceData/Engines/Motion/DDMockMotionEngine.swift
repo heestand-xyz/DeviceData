@@ -20,7 +20,7 @@ public final class DDMockMotionEngine: DDMotionEngine {
     public func startAccelerometerUpdates() {
         accelerometerUpdateTimer = .scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] _ in
             guard let self else { return }
-            let data = (self.accelerometerLastData + .random(in: -0.1...0.1)) * 0.99
+            let data = (self.accelerometerLastData + SIMD3<Double>.random(in: -0.1...0.1)) * 0.99
             self.accelerometerDataPassthroughSubject.send(data)
             self.accelerometerLastData = data
         }
@@ -35,7 +35,7 @@ public final class DDMockMotionEngine: DDMotionEngine {
     public func startGyroscopeUpdates() {
         gyroscopeUpdateTimer = .scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] _ in
             guard let self else { return }
-            let data = (self.gyroscopeLastData + .random(in: -0.1...0.1)) * 0.99
+            let data = (self.gyroscopeLastData + SIMD3<Double>.random(in: -0.1...0.1)) * 0.99
             self.gyroscopeDataPassthroughSubject.send(data)
             self.gyroscopeLastData = data
         }

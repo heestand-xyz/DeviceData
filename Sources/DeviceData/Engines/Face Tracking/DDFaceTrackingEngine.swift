@@ -1,3 +1,5 @@
+#if !os(visionOS)
+
 import Combine
 import ARKit
 import SceneKit
@@ -69,3 +71,5 @@ extension DDFaceTrackingEngine: ARSessionDelegate {
         self.faceAnchor.send(nil)
     }
 }
+
+#endif

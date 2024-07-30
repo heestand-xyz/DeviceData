@@ -1,3 +1,5 @@
+#if !os(visionOS)
+
 import ARKit
 import SceneKit
 import simd
@@ -196,3 +198,5 @@ extension DDFaceTrack {
         "rotation/w",
     ]
 }
+
+#endif

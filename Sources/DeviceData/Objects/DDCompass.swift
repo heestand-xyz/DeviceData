@@ -1,3 +1,5 @@
+#if !os(visionOS)
+
 import Combine
 import CoreLocation
 
@@ -39,3 +41,5 @@ public final class DDCompass: DDObject {
         engine.authorize()
     }
 }
+
+#endif

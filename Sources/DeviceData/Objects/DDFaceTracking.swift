@@ -1,3 +1,5 @@
+#if !os(visionOS)
+
 import Combine
 import ARKit
 
@@ -65,3 +67,5 @@ public final class DDFaceTracking: DDObject {
         engine.authorize()
     }
 }
+
+#endif
