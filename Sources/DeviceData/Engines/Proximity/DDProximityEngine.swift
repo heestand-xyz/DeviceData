@@ -1,3 +1,4 @@
+#if os(iOS)
 import Combine
 import UIKit
 
@@ -54,3 +55,4 @@ public final class DDProximityEngine: DDEngine {
         state.send(UIDevice.current.proximityState)
     }
 }
+#endif

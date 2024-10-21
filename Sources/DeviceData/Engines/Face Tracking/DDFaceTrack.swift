@@ -1,4 +1,4 @@
-#if !os(visionOS)
+#if os(iOS)
 
 import ARKit
 import SceneKit

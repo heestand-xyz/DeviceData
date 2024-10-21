@@ -1,3 +1,8 @@
+#if os(macOS)
+public final class DDMockMotionEngine: DDMotionEngine {
+    public init() {}
+}
+#else
 import Foundation
 import Combine
 
@@ -47,3 +52,4 @@ public final class DDMockMotionEngine: DDMotionEngine {
         gyroscopeLastData = .zero
     }
 }
+#endif

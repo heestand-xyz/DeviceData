@@ -30,7 +30,9 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
 
         super.init()
         
+#if !os(macOS)
         try? AVAudioSession.sharedInstance().setCategory(.record)
+#endif
     }
     
     func authorize() {

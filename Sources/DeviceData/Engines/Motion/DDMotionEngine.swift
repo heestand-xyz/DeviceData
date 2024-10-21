@@ -1,3 +1,6 @@
+#if os(macOS)
+public protocol DDMotionEngine: DDEngine {}
+#else
 import simd
 import Combine
 import CoreMotion
@@ -16,6 +19,7 @@ public protocol DDMotionEngine: DDEngine {
     func startGyroscopeUpdates()
     func stopGyroscopeUpdates()
 }
+#endif
 
 extension DDMotionEngine {
     

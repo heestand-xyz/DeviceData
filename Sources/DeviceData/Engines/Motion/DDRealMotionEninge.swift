@@ -1,3 +1,8 @@
+#if os(macOS)
+public final class DDRealMotionEngine: DDMotionEngine {
+    public init() {}
+}
+#else
 import Combine
 import CoreMotion
 
@@ -43,3 +48,4 @@ public final class DDRealMotionEngine: DDMotionEngine {
         manager.stopGyroUpdates()
     }
 }
+#endif

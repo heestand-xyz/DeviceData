@@ -1,3 +1,4 @@
+#if !os(macOS)
 import Combine
 import CoreMotion
 
@@ -42,3 +43,4 @@ public final class DDAccelerometer<E: DDMotionEngine>: DDObject {
     
     public func authorize() {}
 }
+#endif

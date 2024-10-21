@@ -1,3 +1,4 @@
+#if os(iOS)
 import Combine
 
 public final class DDProximity: DDObject {
@@ -32,3 +33,4 @@ public final class DDProximity: DDObject {
     
     public func authorize() {}
 }
+#endif

@@ -6,7 +6,7 @@ public final class DDLocationEngine: NSObject, DDEngine {
     private let manager: CLLocationManager
     
     public var location: PassthroughSubject<CLLocation, Never> = .init()
-#if !os(visionOS)
+#if os(iOS)
     public var heading: PassthroughSubject<CLHeading, Never> = .init()
 #endif
     
@@ -39,7 +39,7 @@ public final class DDLocationEngine: NSObject, DDEngine {
         manager.stopUpdatingLocation()
     }
     
-#if !os(visionOS)
+#if os(iOS)
     func startUpdatingHeading() {
         manager.startUpdatingHeading()
     }
@@ -61,7 +61,7 @@ extension DDLocationEngine: CLLocationManagerDelegate {
         self.location.send(location)
     }
     
-#if !os(visionOS)
+#if os(iOS)
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         self.heading.send(newHeading)
     }
