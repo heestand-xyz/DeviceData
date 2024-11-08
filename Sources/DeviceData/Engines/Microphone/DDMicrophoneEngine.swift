@@ -35,7 +35,7 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
 #endif
     }
     
-    func authorize() {
+    public func authorize() {
         AVCaptureDevice.requestAccess(for: .audio) { [weak self] _ in
             DispatchQueue.main.async {
                 self?.authorization.value = AVCaptureDevice.authorizationStatus(for: .audio)
@@ -51,7 +51,7 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
 //        }
     }
     
-    func startUpdating() {
+    public func startUpdating() {
         guard recorder?.prepareToRecord() == true else { return }
         recorder?.isMeteringEnabled = true
         recorder?.record()
@@ -64,7 +64,7 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
         }
     }
     
-    func stopUpdating() {
+    public func stopUpdating() {
         recorder?.stop()
         recorder?.deleteRecording()
         timer?.invalidate()

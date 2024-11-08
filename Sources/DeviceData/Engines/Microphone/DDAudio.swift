@@ -1,6 +1,6 @@
 import CoreGraphics
 
-public struct DDAudio {
+public struct DDAudio: Hashable {
     public var amplitude: CGFloat {
         pow(10.0, averagePower / 20.0)
     }
