@@ -27,24 +27,24 @@ public final class DDLocationEngine: NSObject, DDEngine {
 //        manager.allowsBackgroundLocationUpdates = true
     }
     
-    func authorize() {
+    public func authorize() {
         manager.requestWhenInUseAuthorization()
     }
     
-    func startUpdatingLocation() {
+    public func startUpdatingLocation() {
         manager.startUpdatingLocation()
     }
     
-    func stopUpdatingLocation() {
+    public func stopUpdatingLocation() {
         manager.stopUpdatingLocation()
     }
     
 #if os(iOS)
-    func startUpdatingHeading() {
+    public func startUpdatingHeading() {
         manager.startUpdatingHeading()
     }
     
-    func stopUpdatingHeading() {
+    public func stopUpdatingHeading() {
         manager.stopUpdatingHeading()
     }
 #endif
