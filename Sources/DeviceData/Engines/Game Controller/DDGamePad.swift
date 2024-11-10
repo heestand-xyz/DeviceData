@@ -1,13 +1,13 @@
 import CoreGraphics
 import OrderedCollections
 
-public struct DDGamePad {
+public struct DDGamePad: Hashable {
     
     public var home: Bool
     public var menu: Bool
     public var options: Bool
     
-    public struct Arrows {
+    public struct Arrows: Hashable {
         public var left: Bool
         public var right: Bool
         public var up: Bool
@@ -16,7 +16,7 @@ public struct DDGamePad {
     public var dpad: Arrows
     public var action: Arrows
     
-    public struct Sick {
+    public struct Sick: Hashable {
         public var x: CGFloat
         public var y: CGFloat
         public var active: Bool
@@ -24,7 +24,7 @@ public struct DDGamePad {
     public var leftStick: Sick
     public var rightStick: Sick
     
-    public struct TouchPad {
+    public struct TouchPad: Hashable {
         public var x: CGFloat
         public var y: CGFloat
         public var active: Bool

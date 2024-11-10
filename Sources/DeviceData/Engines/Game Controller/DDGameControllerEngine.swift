@@ -3,21 +3,30 @@ import GameController
 
 public final class DDGameControllerEngine: DDEngine {
 
-    var active: Bool = false
+    public var active: Bool = false
     
     private var controller: GCController?
     
-    let isConnected: CurrentValueSubject<Bool, Never> = .init(false)
+    public let isConnected: CurrentValueSubject<Bool, Never> = .init(false)
     
-    let gamePad: CurrentValueSubject<DDGamePad?, Never> = .init(nil)
+    public let gamePad: CurrentValueSubject<DDGamePad?, Never> = .init(nil)
     
     public init() {
         listen()
     }
     
+    deinit {
+        unlisten()
+    }
+    
     private func listen() {
         Foundation.NotificationCenter.default.addObserver(self, selector: #selector(controllerConnected), name: NSNotification.Name.GCControllerDidConnect, object: nil)
         Foundation.NotificationCenter.default.addObserver(self, selector: #selector(controllerDisconnected), name: NSNotification.Name.GCControllerDidDisconnect, object: nil)
+    }
+    
+    public func unlisten() {
+        Foundation.NotificationCenter.default.removeObserver(self, name: NSNotification.Name.GCControllerDidConnect, object: nil)
+        Foundation.NotificationCenter.default.removeObserver(self, name: NSNotification.Name.GCControllerDidDisconnect, object: nil)
     }
 
     @objc private func controllerConnected(notification: NSNotification) {
