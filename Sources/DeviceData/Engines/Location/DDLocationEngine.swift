@@ -48,6 +48,12 @@ public final class DDLocationEngine: NSObject, DDEngine {
         manager.stopUpdatingHeading()
     }
 #endif
+    
+    public func checkLocation() {
+        if let location = manager.location {
+            self.location.send(location)
+        }
+    }
 }
 
 extension DDLocationEngine: CLLocationManagerDelegate {
