@@ -9,6 +9,11 @@ public struct DDFaceTrack {
     
     public let cameraTransform: SCNMatrix4?
     public let faceAnchor: ARFaceAnchor?
+    
+    public init(cameraTransform: SCNMatrix4?, faceAnchor: ARFaceAnchor?) {
+        self.cameraTransform = cameraTransform
+        self.faceAnchor = faceAnchor
+    }
 }
 
 extension DDFaceTrack {

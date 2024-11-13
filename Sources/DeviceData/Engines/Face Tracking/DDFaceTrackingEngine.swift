@@ -13,8 +13,8 @@ public final class DDFaceTrackingEngine: NSObject, DDEngine {
 
     var session: ARSession?
     
-    let cameraTransform: PassthroughSubject<SCNMatrix4?, Never> = .init()
-    let faceAnchor: PassthroughSubject<ARFaceAnchor?, Never> = .init()
+    public let cameraTransform: PassthroughSubject<SCNMatrix4?, Never> = .init()
+    public let faceAnchor: PassthroughSubject<ARFaceAnchor?, Never> = .init()
     
     public var authorization: CurrentValueSubject<AVAuthorizationStatus, Never>
     
@@ -23,7 +23,7 @@ public final class DDFaceTrackingEngine: NSObject, DDEngine {
         super.init()
     }
     
-    func authorize() {
+    public func authorize() {
         AVCaptureDevice.requestAccess(for: .video) { [weak self] _ in
             DispatchQueue.main.async {
                 self?.authorization.value = AVCaptureDevice.authorizationStatus(for: .video)
@@ -31,7 +31,7 @@ public final class DDFaceTrackingEngine: NSObject, DDEngine {
         }
     }
     
-    func start() {
+    public func start() {
         session = ARSession()
         let configuration: ARConfiguration = ARFaceTrackingConfiguration()
         if let videoFormat = ARFaceTrackingConfiguration.supportedVideoFormats.first {
@@ -46,7 +46,7 @@ public final class DDFaceTrackingEngine: NSObject, DDEngine {
         session!.delegate = self
     }
     
-    func stop() {
+    public func stop() {
         session?.pause()
         session = nil
         cameraTransform.send(nil)
