@@ -1,3 +1,4 @@
+#if !os(tvOS)
 import Combine
 import CoreLocation
 
@@ -57,3 +58,4 @@ public final class DDLocation: DDObject {
         engine.authorize()
     }
 }
+#endif

@@ -1,4 +1,4 @@
-#if os(macOS)
+#if os(macOS) || os(tvOS)
 public final class DDMockMotionEngine: DDMotionEngine {
     public init() {}
 }

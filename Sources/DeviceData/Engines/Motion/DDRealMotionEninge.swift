@@ -1,4 +1,4 @@
-#if os(macOS)
+#if os(macOS) || os(tvOS)
 public final class DDRealMotionEngine: DDMotionEngine {
     public init() {}
 }

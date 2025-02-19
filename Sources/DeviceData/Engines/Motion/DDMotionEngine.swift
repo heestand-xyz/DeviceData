@@ -1,4 +1,4 @@
-#if os(macOS)
+#if os(macOS) || os(tvOS)
 public protocol DDMotionEngine: DDEngine {}
 #else
 import simd

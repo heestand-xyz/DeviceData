@@ -1,3 +1,4 @@
+#if !os(tvOS)
 import Combine
 import CoreLocation
 
@@ -73,3 +74,4 @@ extension DDLocationEngine: CLLocationManagerDelegate {
     }
 #endif
 }
+#endif

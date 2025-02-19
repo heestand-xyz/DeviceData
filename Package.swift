@@ -6,6 +6,7 @@ let package = Package(
     name: "DeviceData",
     platforms: [
         .iOS(.v16),
+        .tvOS(.v17),
         .macOS(.v13),
         .visionOS(.v1),
     ],
