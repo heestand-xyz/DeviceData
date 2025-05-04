@@ -20,10 +20,10 @@ extension DDFaceTrack {
     
     public static let defaultActive: OrderedDictionary<String, Bool> = {
         var keys: OrderedDictionary<String, Bool> = [:]
-        for key in matrixKeys.map({ "camera/\($0)" }) { keys[key] = true }
-        for key in matrixKeys.map({ "face/\($0)" }) { keys[key] = true }
-        for key in matrixKeys.map({ "eye/left/\($0)" }) { keys[key] = false }
-        for key in matrixKeys.map({ "eye/right/\($0)" }) { keys[key] = false }
+        for key in simd_float4x4.matrixKeys.map({ "camera/\($0)" }) { keys[key] = true }
+        for key in simd_float4x4.matrixKeys.map({ "face/\($0)" }) { keys[key] = true }
+        for key in simd_float4x4.matrixKeys.map({ "eye/left/\($0)" }) { keys[key] = false }
+        for key in simd_float4x4.matrixKeys.map({ "eye/right/\($0)" }) { keys[key] = false }
         for key in ["x", "y", "z"].map({ "lookAt/\($0)" }) { keys[key] = false }
         keys["blendShape/browDownLeft"] = false
         keys["blendShape/browDownRight"] = false
@@ -149,59 +149,28 @@ extension DDFaceTrack {
             allValues["lookAt/y"] = CGFloat(faceAnchor.lookAtPoint.y)
             allValues["lookAt/z"] = CGFloat(faceAnchor.lookAtPoint.z)
             
-            for (key, value) in values(matrix: faceAnchor.leftEyeTransform) {
+            for (key, value) in faceAnchor.leftEyeTransform.matrixValues() {
                 allValues["eye/left/\(key)"] = value
             }
             
-            for (key, value) in values(matrix: faceAnchor.rightEyeTransform) {
+            for (key, value) in faceAnchor.rightEyeTransform.matrixValues() {
                 allValues["eye/right/\(key)"] = value
             }
             
-            for (key, value) in values(matrix: faceAnchor.transform) {
+            for (key, value) in faceAnchor.transform.matrixValues() {
                 allValues["face/\(key)"] = value
             }
         }
         
         if let cameraTransform {
             
-            for (key, value) in values(matrix: simd_float4x4(cameraTransform)) {
+            for (key, value) in simd_float4x4(cameraTransform).matrixValues() {
                 allValues["camera/\(key)"] = value
             }
         }
         
         return allValues
     }
-}
-
-extension DDFaceTrack {
-    
-    private func values(matrix: simd_float4x4) -> [String: CGFloat] {
-        
-        var values: [String : CGFloat] = [:]
-        
-        values["position/x"] = CGFloat(matrix.columns.3.x)
-        values["position/y"] = CGFloat(matrix.columns.3.y)
-        values["position/z"] = CGFloat(matrix.columns.3.z)
-        
-        let rotationMatrix = simd_quatf(matrix)
-        
-        values["rotation/x"] = CGFloat(rotationMatrix.vector.x)
-        values["rotation/y"] = CGFloat(rotationMatrix.vector.y)
-        values["rotation/z"] = CGFloat(rotationMatrix.vector.z)
-        values["rotation/w"] = CGFloat(rotationMatrix.vector.w)
-        
-        return values
-    }
-    
-    static let matrixKeys: [String] = [
-        "position/x",
-        "position/y",
-        "position/z",
-        "rotation/x",
-        "rotation/y",
-        "rotation/z",
-        "rotation/w",
-    ]
 }
 
 #endif
