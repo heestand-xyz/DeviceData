@@ -13,6 +13,12 @@ public final class DDLocationEngine: NSObject, DDEngine {
     
     public var authorization: CurrentValueSubject<CLAuthorizationStatus, Never>
     
+    public var isAuthorized: Bool {
+        [.authorizedAlways, .authorizedWhenInUse].contains(authorization.value)
+    }
+    
+    private var authorizationContinuation: CheckedContinuation<Void, Never>?
+    
     public override init() {
         
         let manager = CLLocationManager()
@@ -26,6 +32,16 @@ public final class DDLocationEngine: NSObject, DDEngine {
         
 //        manager.pausesLocationUpdatesAutomatically = false
 //        manager.allowsBackgroundLocationUpdates = true
+    }
+    
+    public func authorizeIfNeeded() async -> Bool {
+        if isAuthorized { return true }
+        await withCheckedContinuation { continuation in
+            authorizationContinuation = continuation
+            manager.requestWhenInUseAuthorization()
+        }
+        authorizationContinuation = nil
+        return isAuthorized
     }
     
     public func authorize() {
@@ -61,6 +77,9 @@ extension DDLocationEngine: CLLocationManagerDelegate {
     
     public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorization.value = manager.authorizationStatus
+        if let authorizationContinuation {
+            authorizationContinuation.resume()
+        }
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

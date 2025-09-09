@@ -11,6 +11,8 @@ public final class DDGameControllerEngine: DDEngine {
     
     public let gamePad: CurrentValueSubject<DDGamePad?, Never> = .init(nil)
     
+    public var isAuthorized: Bool { true }
+    
     public init() {
         listen()
     }
@@ -18,6 +20,8 @@ public final class DDGameControllerEngine: DDEngine {
     deinit {
         unlisten()
     }
+    
+    public func authorizeIfNeeded() async -> Bool { isAuthorized }
     
     private func listen() {
         Foundation.NotificationCenter.default.addObserver(self, selector: #selector(controllerConnected), name: NSNotification.Name.GCControllerDidConnect, object: nil)

@@ -20,9 +20,13 @@ public final class DDRealMotionEngine: DDMotionEngine {
     
     let manager: CMMotionManager
     
+    public var isAuthorized: Bool { true }
+    
     public init() {
         manager = CMMotionManager()
     }
+    
+    public func authorizeIfNeeded() async -> Bool { isAuthorized }
     
     public func startAccelerometerUpdates() {
         manager.startAccelerometerUpdates(to: .main) { [weak self] data, error in

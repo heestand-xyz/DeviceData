@@ -5,7 +5,7 @@ import ARKit
 import SceneKit
 import AVKit
 
-public final class DDBodyTrackingEngine: NSObject, DDEngine {
+public final class DDBodyTrackingEngine: NSObject, DDEngine, @unchecked Sendable {
     
     public var available: Bool {
         ARFaceTrackingConfiguration.isSupported
@@ -18,9 +18,24 @@ public final class DDBodyTrackingEngine: NSObject, DDEngine {
     
     public var authorization: CurrentValueSubject<AVAuthorizationStatus, Never>
     
+    public var isAuthorized: Bool {
+        authorization.value == .authorized
+    }
+    
     public override init() {
         authorization = .init(AVCaptureDevice.authorizationStatus(for: .video))
         super.init()
+    }
+    
+    public func authorizeIfNeeded() async -> Bool {
+        if isAuthorized { return true }
+        return await withCheckedContinuation { continuation in
+            AVCaptureDevice.requestAccess(for: .video) { [weak self] _ in
+                let status = AVCaptureDevice.authorizationStatus(for: .video)
+                self?.authorization.value = status
+                continuation.resume(returning: status == .authorized)
+            }
+        }
     }
     
     public func authorize() {

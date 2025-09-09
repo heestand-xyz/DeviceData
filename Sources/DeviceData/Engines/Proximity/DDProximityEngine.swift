@@ -28,6 +28,8 @@ public final class DDProximityEngine: DDEngine {
     
     var state: PassthroughSubject<Bool, Never> = .init()
     
+    public var isAuthorized: Bool { true }
+    
     private var cancelBag: Set<AnyCancellable> = []
     
     public init() {
@@ -54,5 +56,7 @@ public final class DDProximityEngine: DDEngine {
     @objc private func proximityStateChange() {
         state.send(UIDevice.current.proximityState)
     }
+    
+    public func authorizeIfNeeded() async -> Bool { isAuthorized }
 }
 #endif

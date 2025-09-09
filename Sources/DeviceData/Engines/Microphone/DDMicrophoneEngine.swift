@@ -1,7 +1,7 @@
 import Combine
 import AVKit
 
-public final class DDMicrophoneEngine: NSObject, DDEngine {
+public final class DDMicrophoneEngine: NSObject, DDEngine, @unchecked Sendable {
 
     private let recorder: AVAudioRecorder?
     private var timer: Timer?
@@ -13,6 +13,10 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
     public var authorization: CurrentValueSubject<AVAuthorizationStatus, Never>
 //    public var authorization: CurrentValueSubject<DDAuthorization, Never>
 
+    public var isAuthorized: Bool {
+        authorization.value == .authorized
+    }
+    
     public override init() {
 
         let url: URL = FileManager.default.temporaryDirectory
@@ -35,20 +39,23 @@ public final class DDMicrophoneEngine: NSObject, DDEngine {
 #endif
     }
     
+    public func authorizeIfNeeded() async -> Bool {
+        if isAuthorized { return true }
+        return await withCheckedContinuation { continuation in
+            AVCaptureDevice.requestAccess(for: .audio) { [weak self] _ in
+                let status = AVCaptureDevice.authorizationStatus(for: .audio)
+                self?.authorization.value = status
+                continuation.resume(returning: status == .authorized)
+            }
+        }
+    }
+        
     public func authorize() {
         AVCaptureDevice.requestAccess(for: .audio) { [weak self] _ in
             DispatchQueue.main.async {
                 self?.authorization.value = AVCaptureDevice.authorizationStatus(for: .audio)
             }
         }
-//        if #available(iOS 17.0, *) {
-//            Task {
-//                await AudioAuth.authorize()
-//                await MainActor.run {
-//                    authorization.value = AudioAuth.authorization()
-//                }
-//            }
-//        }
     }
     
     public func startUpdating() {
