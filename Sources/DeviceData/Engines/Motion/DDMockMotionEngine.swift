@@ -1,12 +1,12 @@
 #if os(macOS) || os(tvOS)
-public final class DDMockMotionEngine: DDMotionEngine {
+public final class DDMockMotionEngine: DDMotionEngine, @unchecked Sendable {
     public init() {}
 }
 #else
 import Foundation
 import Combine
 
-public final class DDMockMotionEngine: DDMotionEngine {
+public final class DDMockMotionEngine: DDMotionEngine, @unchecked Sendable {
     
     public var isAccelerometerAvailable: Bool = true
     public var isGyroscopeAvailable: Bool = true
@@ -25,6 +25,18 @@ public final class DDMockMotionEngine: DDMotionEngine {
     public init() {}
     
     public func authorizeIfNeeded() async -> Bool { isAuthorized }
+    
+    @MainActor
+    public func startAll() {
+        startAccelerometerUpdates()
+        startGyroscopeUpdates()
+    }
+    
+    @MainActor
+    public func stopAll() {
+        stopAccelerometerUpdates()
+        stopGyroscopeUpdates()
+    }
     
     public func startAccelerometerUpdates() {
         accelerometerUpdateTimer = .scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] _ in

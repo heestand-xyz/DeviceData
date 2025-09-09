@@ -46,6 +46,16 @@ public final class DDBodyTrackingEngine: NSObject, DDEngine, @unchecked Sendable
         }
     }
     
+    @MainActor
+    public func startAll() {
+        start()
+    }
+    
+    @MainActor
+    public func stopAll() {
+        stop()
+    }
+    
     public func start() {
         session = ARSession()
         let configuration: ARConfiguration = ARBodyTrackingConfiguration()

@@ -1,12 +1,12 @@
 #if os(macOS) || os(tvOS)
-public final class DDRealMotionEngine: DDMotionEngine {
+public final class DDRealMotionEngine: DDMotionEngine, @unchecked Sendable {
     public init() {}
 }
 #else
 import Combine
 import CoreMotion
 
-public final class DDRealMotionEngine: DDMotionEngine {
+public final class DDRealMotionEngine: DDMotionEngine, @unchecked Sendable {
     
     public var isAccelerometerAvailable: Bool {
         manager.isAccelerometerAvailable
@@ -27,6 +27,18 @@ public final class DDRealMotionEngine: DDMotionEngine {
     }
     
     public func authorizeIfNeeded() async -> Bool { isAuthorized }
+    
+    @MainActor
+    public func startAll() {
+        startAccelerometerUpdates()
+        startGyroscopeUpdates()
+    }
+    
+    @MainActor
+    public func stopAll() {
+        stopAccelerometerUpdates()
+        stopGyroscopeUpdates()
+    }
     
     public func startAccelerometerUpdates() {
         manager.startAccelerometerUpdates(to: .main) { [weak self] data, error in

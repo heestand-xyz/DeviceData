@@ -2,7 +2,7 @@
 import Combine
 import CoreLocation
 
-public final class DDLocationEngine: NSObject, DDEngine {
+public final class DDLocationEngine: NSObject, DDEngine, @unchecked Sendable {
     
     private let manager: CLLocationManager
     
@@ -46,6 +46,22 @@ public final class DDLocationEngine: NSObject, DDEngine {
     
     public func authorize() {
         manager.requestWhenInUseAuthorization()
+    }
+    
+    @MainActor
+    public func startAll() {
+        startUpdatingLocation()
+#if os(iOS)
+        startUpdatingHeading()
+#endif
+    }
+    
+    @MainActor
+    public func stopAll() {
+        stopUpdatingLocation()
+#if os(iOS)
+        stopUpdatingHeading()
+#endif
     }
     
     public func startUpdatingLocation() {

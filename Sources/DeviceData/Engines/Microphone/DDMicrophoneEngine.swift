@@ -58,6 +58,16 @@ public final class DDMicrophoneEngine: NSObject, DDEngine, @unchecked Sendable {
         }
     }
     
+    @MainActor
+    public func startAll() {
+        startUpdating()
+    }
+    
+    @MainActor
+    public func stopAll() {
+        stopUpdating()
+    }
+    
     public func startUpdating() {
         guard recorder?.prepareToRecord() == true else { return }
         recorder?.isMeteringEnabled = true

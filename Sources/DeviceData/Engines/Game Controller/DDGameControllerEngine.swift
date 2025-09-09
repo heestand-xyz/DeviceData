@@ -1,7 +1,7 @@
 import Combine
 import GameController
 
-public final class DDGameControllerEngine: DDEngine {
+public final class DDGameControllerEngine: DDEngine, @unchecked Sendable {
 
     public var active: Bool = false
     
@@ -22,6 +22,16 @@ public final class DDGameControllerEngine: DDEngine {
     }
     
     public func authorizeIfNeeded() async -> Bool { isAuthorized }
+    
+    @MainActor
+    public func startAll() {
+        active = true
+    }
+    
+    @MainActor
+    public func stopAll() {
+        active = false
+    }
     
     private func listen() {
         Foundation.NotificationCenter.default.addObserver(self, selector: #selector(controllerConnected), name: NSNotification.Name.GCControllerDidConnect, object: nil)

@@ -2,7 +2,7 @@
 import Combine
 import UIKit
 
-public final class DDProximityEngine: DDEngine {
+public final class DDProximityEngine: DDEngine, @unchecked Sendable {
     
     private var enabled: Bool {
         get {
@@ -53,10 +53,16 @@ public final class DDProximityEngine: DDEngine {
             .store(in: &cancelBag)
     }
     
+    public func authorizeIfNeeded() async -> Bool { isAuthorized }
+    
+    @MainActor
+    public func startAll() {}
+    
+    @MainActor
+    public func stopAll() {}
+    
     @objc private func proximityStateChange() {
         state.send(UIDevice.current.proximityState)
     }
-    
-    public func authorizeIfNeeded() async -> Bool { isAuthorized }
 }
 #endif
