@@ -83,14 +83,14 @@ extension DDBodyTrackingEngine: ARSessionDelegate {
     
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         cameraTransform.send(SCNMatrix4(frame.camera.transform))
+        if let bodyAnchor = frame.anchors.compactMap({ $0 as? ARBodyAnchor }).first {
+            self.bodyAnchor.send(bodyAnchor)            
+        }
     }
     
     public func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {}
     
-    public func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
-        guard let bodyAnchor = anchors.first as? ARBodyAnchor else { return }
-        self.bodyAnchor.send(bodyAnchor)
-    }
+    public func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {}
     
     public func session(_ session: ARSession, didRemove anchors: [ARAnchor]) {
         self.bodyAnchor.send(nil)
