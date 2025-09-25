@@ -1,6 +1,13 @@
 #if os(macOS) || os(tvOS)
 public final class DDMockMotionEngine: DDMotionEngine, @unchecked Sendable {
+    public var isAuthorized: Bool { true }
     public init() {}
+    public func authorizeIfNeeded() async -> Bool {
+        isAuthorized
+    }
+    public func startAll() {}
+    public func stopAll() {}
+    
 }
 #else
 import Foundation

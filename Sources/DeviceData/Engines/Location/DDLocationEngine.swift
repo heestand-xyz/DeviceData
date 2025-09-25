@@ -14,7 +14,13 @@ public final class DDLocationEngine: NSObject, DDEngine, @unchecked Sendable {
     public var authorization: CurrentValueSubject<CLAuthorizationStatus, Never>
     
     public var isAuthorized: Bool {
+#if os(visionOS)
+        [.authorizedWhenInUse].contains(authorization.value)
+#elseif os(iOS)
         [.authorizedAlways, .authorizedWhenInUse].contains(authorization.value)
+#elseif os(macOS)
+        [.authorizedAlways].contains(authorization.value)
+#endif
     }
     
     private var authorizationContinuation: CheckedContinuation<Void, Never>?
