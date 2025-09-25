@@ -20,6 +20,7 @@ extension DDBodyTrack {
     
     public static let defaultActive: OrderedDictionary<String, Bool> = {
         var keys: OrderedDictionary<String, Bool> = [:]
+        for key in simd_float4x4.matrixKeys.map({ "skeleton/transform/\($0)" }) { keys[key] = false }
         let defaultNamePaths: [String] = [
             "root",
             "head",
@@ -30,8 +31,8 @@ extension DDBodyTrack {
             "left/foot",
             "right/foot",
         ]
-        for jointName in ARSkeletonDefinition.defaultBody3D.jointNames {
-            let namePath = jointName
+        for rawJointName in ARSkeletonDefinition.defaultBody3D.jointNames {
+            let namePath = rawJointName
                 .replacingOccurrences(of: "_joint", with: "")
                 .replacingOccurrences(of: "_", with: "/")
             for subKey in simd_float4x4.matrixKeys {
@@ -51,17 +52,25 @@ extension DDBodyTrack {
         var allValues: [String : CGFloat] = [:]
         
         if let bodyAnchor {
+            let skeleton = bodyAnchor.skeleton
             var taggedTransforms: [String: simd_float4x4?] = [:]
-            for jointName in ARSkeletonDefinition.defaultBody3D.jointNames {
-                let namePath = jointName
+            taggedTransforms["skeleton/transform"] = bodyAnchor.transform
+            for (i, rawJointName) in ARSkeletonDefinition.defaultBody3D.jointNames.enumerated() {
+                let namePath = rawJointName
                     .replacingOccurrences(of: "_joint", with: "")
                     .replacingOccurrences(of: "_", with: "/")
-                taggedTransforms["skeleton/model/\(namePath)"] = bodyAnchor.skeleton.modelTransform(for: .init(rawValue: jointName))
-                taggedTransforms["skeleton/local/\(namePath)"] = bodyAnchor.skeleton.localTransform(for: .init(rawValue: jointName))
+                guard skeleton.isJointTracked(i) else { continue }
+                guard skeleton.jointModelTransforms.indices.contains(i) else { continue }
+                let modelTransform = skeleton.jointModelTransforms[i]
+                let localTransform = skeleton.jointLocalTransforms[i]
+                taggedTransforms["skeleton/model/\(namePath)"] = bodyAnchor.transform * modelTransform
+                taggedTransforms["skeleton/local/\(namePath)"] = bodyAnchor.transform * localTransform
             }
             for (key, transform) in taggedTransforms {
                 for (subKey, value) in transform?.matrixValues() ?? [:] {
-                    guard subKey.starts(with: "position") else { continue }
+                    if key != "skeleton/transform" {
+                        guard subKey.starts(with: "position") else { continue }
+                    }
                     allValues["\(key)/\(subKey)"] = value
                 }
             }

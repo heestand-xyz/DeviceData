@@ -58,7 +58,8 @@ public final class DDBodyTrackingEngine: NSObject, DDEngine, @unchecked Sendable
     
     public func start() {
         session = ARSession()
-        let configuration: ARConfiguration = ARBodyTrackingConfiguration()
+        let configuration = ARBodyTrackingConfiguration()
+//        configuration.automaticSkeletonScaleEstimationEnabled = true
         if let videoFormat = ARBodyTrackingConfiguration.supportedVideoFormats.first {
             configuration.videoFormat = videoFormat
         }
@@ -84,7 +85,8 @@ extension DDBodyTrackingEngine: ARSessionDelegate {
     public func session(_ session: ARSession, didUpdate frame: ARFrame) {
         cameraTransform.send(SCNMatrix4(frame.camera.transform))
         if let bodyAnchor = frame.anchors.compactMap({ $0 as? ARBodyAnchor }).first {
-            self.bodyAnchor.send(bodyAnchor)            
+//            bodyAnchor.estimatedScaleFactor
+            self.bodyAnchor.send(bodyAnchor)
         }
     }
     
