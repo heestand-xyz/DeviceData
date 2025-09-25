@@ -20,23 +20,29 @@ extension DDBodyTrack {
     
     public static let defaultActive: OrderedDictionary<String, Bool> = {
         var keys: OrderedDictionary<String, Bool> = [:]
-        for key in simd_float4x4.matrixKeys.map({ "camera/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/local/root/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/local/head/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/local/leftHand/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/local/rightHand/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/local/leftShoulder/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/local/rightShoulder/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/local/leftFoot/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/local/rightFoot/\($0)" }) { keys[key] = true }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/model/root/\($0)" }) { keys[key] = false }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/model/head/\($0)" }) { keys[key] = false }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/model/leftHand/\($0)" }) { keys[key] = false }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/model/rightHand/\($0)" }) { keys[key] = false }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/model/leftShoulder/\($0)" }) { keys[key] = false }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/model/rightShoulder/\($0)" }) { keys[key] = false }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/model/leftFoot/\($0)" }) { keys[key] = false }
-        for key in simd_float4x4.matrixKeys.map({ "skeleton/model/rightFoot/\($0)" }) { keys[key] = false }
+        let defaultNamePaths: [String] = [
+            "root",
+            "head",
+            "left/hand",
+            "right/hand",
+            "left/shoulder/1",
+            "right/shoulder/1",
+            "left/foot",
+            "right/foot",
+        ]
+        for jointName in ARSkeletonDefinition.defaultBody3D.jointNames {
+            let namePath = jointName
+                .replacingOccurrences(of: "_joint", with: "")
+                .replacingOccurrences(of: "_", with: "/")
+            for subKey in simd_float4x4.matrixKeys {
+                guard subKey.starts(with: "position") else { continue }
+                let modelKey = "skeleton/model/\(namePath)/\(subKey)"
+                let localKey = "skeleton/local/\(namePath)/\(subKey)"
+                keys[modelKey] = defaultNamePaths.contains(namePath)
+                keys[localKey] = false
+            }
+        }
+        for key in simd_float4x4.matrixKeys.map({ "camera/\($0)" }) { keys[key] = false }
         return keys
     }()
     
@@ -46,24 +52,16 @@ extension DDBodyTrack {
         
         if let bodyAnchor {
             var taggedTransforms: [String: simd_float4x4?] = [:]
-            taggedTransforms["skeleton/local/root"] = bodyAnchor.skeleton.localTransform(for: .root)
-            taggedTransforms["skeleton/local/head"] = bodyAnchor.skeleton.localTransform(for: .head)
-            taggedTransforms["skeleton/local/leftHand"] = bodyAnchor.skeleton.localTransform(for: .leftHand)
-            taggedTransforms["skeleton/local/rightHand"] = bodyAnchor.skeleton.localTransform(for: .rightHand)
-            taggedTransforms["skeleton/local/leftShoulder"] = bodyAnchor.skeleton.localTransform(for: .leftShoulder)
-            taggedTransforms["skeleton/local/rightShoulder"] = bodyAnchor.skeleton.localTransform(for: .rightShoulder)
-            taggedTransforms["skeleton/local/leftFoot"] = bodyAnchor.skeleton.localTransform(for: .leftFoot)
-            taggedTransforms["skeleton/local/rightFoot"] = bodyAnchor.skeleton.localTransform(for: .rightFoot)
-            taggedTransforms["skeleton/model/root"] = bodyAnchor.skeleton.modelTransform(for: .root)
-            taggedTransforms["skeleton/model/head"] = bodyAnchor.skeleton.modelTransform(for: .head)
-            taggedTransforms["skeleton/model/leftHand"] = bodyAnchor.skeleton.modelTransform(for: .leftHand)
-            taggedTransforms["skeleton/model/rightHand"] = bodyAnchor.skeleton.modelTransform(for: .rightHand)
-            taggedTransforms["skeleton/model/leftShoulder"] = bodyAnchor.skeleton.modelTransform(for: .leftShoulder)
-            taggedTransforms["skeleton/model/rightShoulder"] = bodyAnchor.skeleton.modelTransform(for: .rightShoulder)
-            taggedTransforms["skeleton/model/leftFoot"] = bodyAnchor.skeleton.modelTransform(for: .leftFoot)
-            taggedTransforms["skeleton/model/rightFoot"] = bodyAnchor.skeleton.modelTransform(for: .rightFoot)
+            for jointName in ARSkeletonDefinition.defaultBody3D.jointNames {
+                let namePath = jointName
+                    .replacingOccurrences(of: "_joint", with: "")
+                    .replacingOccurrences(of: "_", with: "/")
+                taggedTransforms["skeleton/model/\(namePath)"] = bodyAnchor.skeleton.modelTransform(for: .init(rawValue: jointName))
+                taggedTransforms["skeleton/local/\(namePath)"] = bodyAnchor.skeleton.localTransform(for: .init(rawValue: jointName))
+            }
             for (key, transform) in taggedTransforms {
                 for (subKey, value) in transform?.matrixValues() ?? [:] {
+                    guard subKey.starts(with: "position") else { continue }
                     allValues["\(key)/\(subKey)"] = value
                 }
             }
