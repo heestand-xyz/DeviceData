@@ -5,7 +5,7 @@ import SceneKit
 import simd
 import OrderedCollections
 
-public struct DDFaceTrack {
+public struct DDFaceTrack: Sendable {
     
     public let cameraTransform: SCNMatrix4?
     public let faceAnchor: ARFaceAnchor?
