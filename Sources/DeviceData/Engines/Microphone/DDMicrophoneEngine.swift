@@ -4,7 +4,9 @@ import AVKit
 public final class DDMicrophoneEngine: NSObject, DDEngine, @unchecked Sendable {
 
     private let recorder: AVAudioRecorder?
-    private var timer: Timer?
+    private let meteringQueue = DispatchQueue(label: "data-osc.microphone.metering", qos: .userInteractive)
+    private var timer: DispatchSourceTimer?
+    private static let meteringInterval: DispatchTimeInterval = .nanoseconds(1_000_000_000 / 120)
     
     private var url: URL?
     
@@ -69,25 +71,39 @@ public final class DDMicrophoneEngine: NSObject, DDEngine, @unchecked Sendable {
     }
     
     public func startUpdating() {
-        guard recorder?.prepareToRecord() == true else { return }
-        recorder?.isMeteringEnabled = true
-        recorder?.record()
-        let timer = Timer(timeInterval: 1.0 / 120, repeats: true) { [weak self] _ in
+        meteringQueue.async { [weak self] in
             guard let self else { return }
-            recorder?.updateMeters()
-            guard let averagePower: Float = recorder?.averagePower(forChannel: 0) else { return }
-            guard let peakPower: Float = recorder?.peakPower(forChannel: 0) else { return }
-            audio.send(DDAudio(averagePower: CGFloat(averagePower), peakPower: CGFloat(peakPower)))
+            self.timer?.cancel()
+            self.timer = nil
+            guard self.recorder?.prepareToRecord() == true else { return }
+            self.recorder?.isMeteringEnabled = true
+            self.recorder?.record()
+            let timer = DispatchSource.makeTimerSource(queue: self.meteringQueue)
+            timer.schedule(
+                deadline: .now() + Self.meteringInterval,
+                repeating: Self.meteringInterval,
+                leeway: .milliseconds(1)
+            )
+            timer.setEventHandler { [weak self] in
+                guard let self else { return }
+                self.recorder?.updateMeters()
+                guard let averagePower: Float = self.recorder?.averagePower(forChannel: 0) else { return }
+                guard let peakPower: Float = self.recorder?.peakPower(forChannel: 0) else { return }
+                self.audio.send(DDAudio(averagePower: CGFloat(averagePower), peakPower: CGFloat(peakPower)))
+            }
+            self.timer = timer
+            timer.resume()
         }
-        RunLoop.main.add(timer, forMode: .common)
-        self.timer = timer
     }
     
     public func stopUpdating() {
-        recorder?.stop()
-        recorder?.deleteRecording()
-        timer?.invalidate()
-        timer = nil
+        meteringQueue.async { [weak self] in
+            guard let self else { return }
+            self.timer?.cancel()
+            self.timer = nil
+            self.recorder?.stop()
+            self.recorder?.deleteRecording()
+        }
     }
     
 //    @available(iOS 17.0, *)
