@@ -9,6 +9,33 @@ import simd
 import CoreGraphics
 
 extension simd_float4x4 {
+
+    func matrixValue(for key: String) -> CGFloat? {
+        switch key {
+        case "position/x":
+            CGFloat(columns.3.x)
+        case "position/y":
+            CGFloat(columns.3.y)
+        case "position/z":
+            CGFloat(columns.3.z)
+        case "rotation/x":
+            CGFloat(simd_quatf(self).vector.x)
+        case "rotation/y":
+            CGFloat(simd_quatf(self).vector.y)
+        case "rotation/z":
+            CGFloat(simd_quatf(self).vector.z)
+        case "rotation/w":
+            CGFloat(simd_quatf(self).vector.w)
+        case "rotation/yaw":
+            CGFloat(eulerAngles().y)
+        case "rotation/pitch":
+            CGFloat(eulerAngles().x)
+        case "rotation/roll":
+            CGFloat(eulerAngles().z)
+        default:
+            nil
+        }
+    }
     
     func matrixValues() -> [String: CGFloat] {
         

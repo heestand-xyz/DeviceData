@@ -17,6 +17,61 @@ public struct DDFaceTrack: Sendable {
 }
 
 extension DDFaceTrack {
+
+    private static let blendShapeLocations: [String: ARFaceAnchor.BlendShapeLocation] = [
+        "blendShape/browDownLeft": .browDownLeft,
+        "blendShape/browDownRight": .browDownRight,
+        "blendShape/browInnerUp": .browInnerUp,
+        "blendShape/browOuterUpLeft": .browOuterUpLeft,
+        "blendShape/browOuterUpRight": .browOuterUpRight,
+        "blendShape/cheekPuff": .cheekPuff,
+        "blendShape/cheekSquintLeft": .cheekSquintLeft,
+        "blendShape/cheekSquintRight": .cheekSquintRight,
+        "blendShape/eyeBlinkLeft": .eyeBlinkLeft,
+        "blendShape/eyeBlinkRight": .eyeBlinkRight,
+        "blendShape/eyeLookDownLeft": .eyeLookDownLeft,
+        "blendShape/eyeLookDownRight": .eyeLookDownRight,
+        "blendShape/eyeLookInLeft": .eyeLookInLeft,
+        "blendShape/eyeLookInRight": .eyeLookInRight,
+        "blendShape/eyeLookOutLeft": .eyeLookOutLeft,
+        "blendShape/eyeLookOutRight": .eyeLookOutRight,
+        "blendShape/eyeLookUpLeft": .eyeLookUpLeft,
+        "blendShape/eyeLookUpRight": .eyeLookUpRight,
+        "blendShape/eyeSquintLeft": .eyeSquintLeft,
+        "blendShape/eyeSquintRight": .eyeSquintRight,
+        "blendShape/eyeWideLeft": .eyeWideLeft,
+        "blendShape/eyeWideRight": .eyeWideRight,
+        "blendShape/jawForward": .jawForward,
+        "blendShape/jawLeft": .jawLeft,
+        "blendShape/jawOpen": .jawOpen,
+        "blendShape/jawRight": .jawRight,
+        "blendShape/mouthClose": .mouthClose,
+        "blendShape/mouthDimpleLeft": .mouthDimpleLeft,
+        "blendShape/mouthDimpleRight": .mouthDimpleRight,
+        "blendShape/mouthFrownLeft": .mouthFrownLeft,
+        "blendShape/mouthFrownRight": .mouthFrownRight,
+        "blendShape/mouthFunnel": .mouthFunnel,
+        "blendShape/mouthLeft": .mouthLeft,
+        "blendShape/mouthLowerDownLeft": .mouthLowerDownLeft,
+        "blendShape/mouthLowerDownRight": .mouthLowerDownRight,
+        "blendShape/mouthPressLeft": .mouthPressLeft,
+        "blendShape/mouthPressRight": .mouthPressRight,
+        "blendShape/mouthPucker": .mouthPucker,
+        "blendShape/mouthRight": .mouthRight,
+        "blendShape/mouthRollLower": .mouthRollLower,
+        "blendShape/mouthRollUpper": .mouthRollUpper,
+        "blendShape/mouthShrugLower": .mouthShrugLower,
+        "blendShape/mouthShrugUpper": .mouthShrugUpper,
+        "blendShape/mouthSmileLeft": .mouthSmileLeft,
+        "blendShape/mouthSmileRight": .mouthSmileRight,
+        "blendShape/mouthStretchLeft": .mouthStretchLeft,
+        "blendShape/mouthStretchRight": .mouthStretchRight,
+        "blendShape/mouthUpperUpLeft": .mouthUpperUpLeft,
+        "blendShape/mouthUpperUpRight": .mouthUpperUpRight,
+        "blendShape/noseSneerLeft": .noseSneerLeft,
+        "blendShape/noseSneerRight": .noseSneerRight,
+        "blendShape/tongueOut": .tongueOut,
+    ]
     
     public static let defaultActive: OrderedDictionary<String, Bool> = {
         var keys: OrderedDictionary<String, Bool> = [:]
@@ -80,96 +135,49 @@ extension DDFaceTrack {
         return keys
     }()
     
+    public func value(for address: String) -> CGFloat? {
+        if let key = address.dropPrefix("camera/") {
+            return cameraTransform.flatMap { simd_float4x4($0).matrixValue(for: key) }
+        }
+        guard let faceAnchor else { return nil }
+        if let key = address.dropPrefix("face/") {
+            return faceAnchor.transform.matrixValue(for: key)
+        }
+        if let key = address.dropPrefix("eye/left/") {
+            return faceAnchor.leftEyeTransform.matrixValue(for: key)
+        }
+        if let key = address.dropPrefix("eye/right/") {
+            return faceAnchor.rightEyeTransform.matrixValue(for: key)
+        }
+        switch address {
+        case "lookAt/x":
+            return CGFloat(faceAnchor.lookAtPoint.x)
+        case "lookAt/y":
+            return CGFloat(faceAnchor.lookAtPoint.y)
+        case "lookAt/z":
+            return CGFloat(faceAnchor.lookAtPoint.z)
+        default:
+            guard let blendShapeLocation = Self.blendShapeLocations[address] else { return nil }
+            return CGFloat((faceAnchor.blendShapes[blendShapeLocation] ?? 0.0).floatValue)
+        }
+    }
+
     public func values() -> [String: CGFloat] {
-        
-        var allValues: [String : CGFloat] = [:]
-        
-        if let faceAnchor {
-            
-            let blendShapeValues: [String: NSNumber] = [
-                "blendShape/browDownLeft" : faceAnchor.blendShapes[.browDownLeft] ?? 0.0,
-                "blendShape/browDownRight" : faceAnchor.blendShapes[.browDownRight] ?? 0.0,
-                "blendShape/browInnerUp" : faceAnchor.blendShapes[.browInnerUp] ?? 0.0,
-                "blendShape/browOuterUpLeft" : faceAnchor.blendShapes[.browOuterUpLeft] ?? 0.0,
-                "blendShape/browOuterUpRight" : faceAnchor.blendShapes[.browOuterUpRight] ?? 0.0,
-                "blendShape/cheekPuff" : faceAnchor.blendShapes[.cheekPuff] ?? 0.0,
-                "blendShape/cheekSquintLeft" : faceAnchor.blendShapes[.cheekSquintLeft] ?? 0.0,
-                "blendShape/cheekSquintRight" : faceAnchor.blendShapes[.cheekSquintRight] ?? 0.0,
-                "blendShape/eyeBlinkLeft" : faceAnchor.blendShapes[.eyeBlinkLeft] ?? 0.0,
-                "blendShape/eyeBlinkRight" : faceAnchor.blendShapes[.eyeBlinkRight] ?? 0.0,
-                "blendShape/eyeLookDownLeft" : faceAnchor.blendShapes[.eyeLookDownLeft] ?? 0.0,
-                "blendShape/eyeLookDownRight" : faceAnchor.blendShapes[.eyeLookDownRight] ?? 0.0,
-                "blendShape/eyeLookInLeft" : faceAnchor.blendShapes[.eyeLookInLeft] ?? 0.0,
-                "blendShape/eyeLookInRight" : faceAnchor.blendShapes[.eyeLookInRight] ?? 0.0,
-                "blendShape/eyeLookOutLeft" : faceAnchor.blendShapes[.eyeLookOutLeft] ?? 0.0,
-                "blendShape/eyeLookOutRight" : faceAnchor.blendShapes[.eyeLookOutRight] ?? 0.0,
-                "blendShape/eyeLookUpLeft" : faceAnchor.blendShapes[.eyeLookUpLeft] ?? 0.0,
-                "blendShape/eyeLookUpRight" : faceAnchor.blendShapes[.eyeLookUpRight] ?? 0.0,
-                "blendShape/eyeSquintLeft" : faceAnchor.blendShapes[.eyeSquintLeft] ?? 0.0,
-                "blendShape/eyeSquintRight" : faceAnchor.blendShapes[.eyeSquintRight] ?? 0.0,
-                "blendShape/eyeWideLeft" : faceAnchor.blendShapes[.eyeWideLeft] ?? 0.0,
-                "blendShape/eyeWideRight" : faceAnchor.blendShapes[.eyeWideRight] ?? 0.0,
-                "blendShape/jawForward" : faceAnchor.blendShapes[.jawForward] ?? 0.0,
-                "blendShape/jawLeft" : faceAnchor.blendShapes[.jawLeft] ?? 0.0,
-                "blendShape/jawOpen" : faceAnchor.blendShapes[.jawOpen] ?? 0.0,
-                "blendShape/jawRight" : faceAnchor.blendShapes[.jawRight] ?? 0.0,
-                "blendShape/mouthClose" : faceAnchor.blendShapes[.mouthClose] ?? 0.0,
-                "blendShape/mouthDimpleLeft" : faceAnchor.blendShapes[.mouthDimpleLeft] ?? 0.0,
-                "blendShape/mouthDimpleRight" : faceAnchor.blendShapes[.mouthDimpleRight] ?? 0.0,
-                "blendShape/mouthFrownLeft" : faceAnchor.blendShapes[.mouthFrownLeft] ?? 0.0,
-                "blendShape/mouthFrownRight" : faceAnchor.blendShapes[.mouthFrownRight] ?? 0.0,
-                "blendShape/mouthFunnel" : faceAnchor.blendShapes[.mouthFunnel] ?? 0.0,
-                "blendShape/mouthLeft" : faceAnchor.blendShapes[.mouthLeft] ?? 0.0,
-                "blendShape/mouthLowerDownLeft" : faceAnchor.blendShapes[.mouthLowerDownLeft] ?? 0.0,
-                "blendShape/mouthLowerDownRight" : faceAnchor.blendShapes[.mouthLowerDownRight] ?? 0.0,
-                "blendShape/mouthPressLeft" : faceAnchor.blendShapes[.mouthPressLeft] ?? 0.0,
-                "blendShape/mouthPressRight" : faceAnchor.blendShapes[.mouthPressRight] ?? 0.0,
-                "blendShape/mouthPucker" : faceAnchor.blendShapes[.mouthPucker] ?? 0.0,
-                "blendShape/mouthRight" : faceAnchor.blendShapes[.mouthRight] ?? 0.0,
-                "blendShape/mouthRollLower" : faceAnchor.blendShapes[.mouthRollLower] ?? 0.0,
-                "blendShape/mouthRollUpper" : faceAnchor.blendShapes[.mouthRollUpper] ?? 0.0,
-                "blendShape/mouthShrugLower" : faceAnchor.blendShapes[.mouthShrugLower] ?? 0.0,
-                "blendShape/mouthShrugUpper" : faceAnchor.blendShapes[.mouthShrugUpper] ?? 0.0,
-                "blendShape/mouthSmileLeft" : faceAnchor.blendShapes[.mouthSmileLeft] ?? 0.0,
-                "blendShape/mouthSmileRight" : faceAnchor.blendShapes[.mouthSmileRight] ?? 0.0,
-                "blendShape/mouthStretchLeft" : faceAnchor.blendShapes[.mouthStretchLeft] ?? 0.0,
-                "blendShape/mouthStretchRight" : faceAnchor.blendShapes[.mouthStretchRight] ?? 0.0,
-                "blendShape/mouthUpperUpLeft" : faceAnchor.blendShapes[.mouthUpperUpLeft] ?? 0.0,
-                "blendShape/mouthUpperUpRight" : faceAnchor.blendShapes[.mouthUpperUpRight] ?? 0.0,
-                "blendShape/noseSneerLeft" : faceAnchor.blendShapes[.noseSneerLeft] ?? 0.0,
-                "blendShape/noseSneerRight" : faceAnchor.blendShapes[.noseSneerRight] ?? 0.0,
-                "blendShape/tongueOut" : faceAnchor.blendShapes[.tongueOut] ?? 0.0,
-            ]
-            
-            for (key, value) in blendShapeValues {
-                allValues[key] = CGFloat(value.floatValue)
-            }
-            
-            allValues["lookAt/x"] = CGFloat(faceAnchor.lookAtPoint.x)
-            allValues["lookAt/y"] = CGFloat(faceAnchor.lookAtPoint.y)
-            allValues["lookAt/z"] = CGFloat(faceAnchor.lookAtPoint.z)
-            
-            for (key, value) in faceAnchor.leftEyeTransform.matrixValues() {
-                allValues["eye/left/\(key)"] = value
-            }
-            
-            for (key, value) in faceAnchor.rightEyeTransform.matrixValues() {
-                allValues["eye/right/\(key)"] = value
-            }
-            
-            for (key, value) in faceAnchor.transform.matrixValues() {
-                allValues["face/\(key)"] = value
+        var values: [String: CGFloat] = [:]
+        for (address, _) in Self.defaultActive {
+            if let value = value(for: address) {
+                values[address] = value
             }
         }
-        
-        if let cameraTransform {
-            
-            for (key, value) in simd_float4x4(cameraTransform).matrixValues() {
-                allValues["camera/\(key)"] = value
-            }
-        }
-        
-        return allValues
+        return values
+    }
+}
+
+private extension String {
+
+    func dropPrefix(_ prefix: String) -> String? {
+        guard hasPrefix(prefix) else { return nil }
+        return String(dropFirst(prefix.count))
     }
 }
 

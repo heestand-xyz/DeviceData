@@ -17,6 +17,17 @@ public struct DDBodyTrack {
 }
 
 extension DDBodyTrack {
+
+    private static let jointIndicesByNamePath: [String: Int] = {
+        var indices: [String: Int] = [:]
+        for (index, rawJointName) in ARSkeletonDefinition.defaultBody3D.jointNames.enumerated() {
+            let namePath = rawJointName
+                .replacingOccurrences(of: "_joint", with: "")
+                .replacingOccurrences(of: "_", with: "/")
+            indices[namePath] = index
+        }
+        return indices
+    }()
     
     public static let defaultActive: OrderedDictionary<String, Bool> = {
         var keys: OrderedDictionary<String, Bool> = [:]
@@ -47,42 +58,71 @@ extension DDBodyTrack {
         return keys
     }()
     
+    public func value(for address: String) -> CGFloat? {
+        if let key = address.dropPrefix("camera/") {
+            return cameraTransform.flatMap { simd_float4x4($0).matrixValue(for: key) }
+        }
+        guard let bodyAnchor else { return nil }
+        if let key = address.dropPrefix("skeleton/transform/") {
+            return bodyAnchor.transform.matrixValue(for: key)
+        }
+        if let key = address.dropPrefix("skeleton/model/") {
+            return jointValue(for: key, in: bodyAnchor, transformType: .model)
+        }
+        if let key = address.dropPrefix("skeleton/local/") {
+            return jointValue(for: key, in: bodyAnchor, transformType: .local)
+        }
+        return nil
+    }
+
     public func values() -> [String: CGFloat] {
-        
-        var allValues: [String : CGFloat] = [:]
-        
-        if let bodyAnchor {
-            let skeleton = bodyAnchor.skeleton
-            var taggedTransforms: [String: simd_float4x4?] = [:]
-            taggedTransforms["skeleton/transform"] = bodyAnchor.transform
-            for (i, rawJointName) in ARSkeletonDefinition.defaultBody3D.jointNames.enumerated() {
-                let namePath = rawJointName
-                    .replacingOccurrences(of: "_joint", with: "")
-                    .replacingOccurrences(of: "_", with: "/")
-                guard skeleton.isJointTracked(i) else { continue }
-                guard skeleton.jointModelTransforms.indices.contains(i) else { continue }
-                let modelTransform = skeleton.jointModelTransforms[i]
-                let localTransform = skeleton.jointLocalTransforms[i]
-                taggedTransforms["skeleton/model/\(namePath)"] = bodyAnchor.transform * modelTransform
-                taggedTransforms["skeleton/local/\(namePath)"] = bodyAnchor.transform * localTransform
-            }
-            for (key, transform) in taggedTransforms {
-                for (subKey, value) in transform?.matrixValues() ?? [:] {
-                    if key != "skeleton/transform" {
-                        guard subKey.starts(with: "position") else { continue }
-                    }
-                    allValues["\(key)/\(subKey)"] = value
-                }
+        var values: [String: CGFloat] = [:]
+        for address in Self.defaultActive.keys {
+            if let value = value(for: address) {
+                values[address] = value
             }
         }
-        
-        if let cameraTransform {
-            for (key, value) in simd_float4x4(cameraTransform).matrixValues() {
-                allValues["camera/\(key)"] = value
-            }
+        return values
+    }
+}
+
+private extension DDBodyTrack {
+
+    enum TransformType {
+        case model
+        case local
+    }
+
+    func jointValue(
+        for key: String,
+        in bodyAnchor: ARBodyAnchor,
+        transformType: TransformType
+    ) -> CGFloat? {
+        let matrixKeyPrefix = "/position/"
+        guard let range = key.range(of: matrixKeyPrefix, options: .backwards) else { return nil }
+        let namePath = String(key[..<range.lowerBound])
+        let matrixKey = "position/\(key[range.upperBound...])"
+        guard let jointIndex = Self.jointIndicesByNamePath[namePath] else { return nil }
+        let skeleton = bodyAnchor.skeleton
+        guard skeleton.isJointTracked(jointIndex) else { return nil }
+        guard skeleton.jointModelTransforms.indices.contains(jointIndex) else { return nil }
+        guard skeleton.jointLocalTransforms.indices.contains(jointIndex) else { return nil }
+        let jointTransform: simd_float4x4
+        switch transformType {
+        case .model:
+            jointTransform = skeleton.jointModelTransforms[jointIndex]
+        case .local:
+            jointTransform = skeleton.jointLocalTransforms[jointIndex]
         }
-        
-        return allValues
+        return (bodyAnchor.transform * jointTransform).matrixValue(for: matrixKey)
+    }
+}
+
+private extension String {
+
+    func dropPrefix(_ prefix: String) -> String? {
+        guard hasPrefix(prefix) else { return nil }
+        return String(dropFirst(prefix.count))
     }
 }
 

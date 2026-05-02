@@ -66,33 +66,74 @@ extension DDGamePad {
         "touchpad/active": false,
     ]
 
+    public func value(for address: String) -> DDScalar? {
+        switch address {
+        case "home":
+            .bool(home)
+        case "menu":
+            .bool(menu)
+        case "options":
+            .bool(options)
+        case "dpad/left":
+            .bool(dpad.left)
+        case "dpad/right":
+            .bool(dpad.right)
+        case "dpad/down":
+            .bool(dpad.down)
+        case "dpad/up":
+            .bool(dpad.up)
+        case "action/left":
+            .bool(action.left)
+        case "action/right":
+            .bool(action.right)
+        case "action/down":
+            .bool(action.down)
+        case "action/up":
+            .bool(action.up)
+        case "stick/left/x":
+            .float(leftStick.x)
+        case "stick/left/y":
+            .float(leftStick.y)
+        case "stick/left/active":
+            .bool(leftStick.active)
+        case "stick/right/x":
+            .float(rightStick.x)
+        case "stick/right/y":
+            .float(rightStick.y)
+        case "stick/right/active":
+            .bool(rightStick.active)
+        case "touchpad/x":
+            .float(touchPad.x)
+        case "touchpad/y":
+            .float(touchPad.y)
+        case "touchpad/active":
+            .bool(touchPad.active)
+        case "shoulder/left":
+            .bool(leftShoulder)
+        case "shoulder/right":
+            .bool(rightShoulder)
+        case "trigger/left":
+            .float(leftTrigger)
+        case "trigger/right":
+            .float(rightTrigger)
+        default:
+            nil
+        }
+    }
+
     public func values() -> [String: Any] {
-         [
-            "home": home,
-            "menu": menu,
-            "options": options,
-            "dpad/left": dpad.left,
-            "dpad/right": dpad.right,
-            "dpad/down": dpad.down,
-            "dpad/up": dpad.up,
-            "action/left": action.left,
-            "action/right": action.right,
-            "action/down": action.down,
-            "action/up": action.up,
-            "stick/left/x": leftStick.x,
-            "stick/left/y": leftStick.y,
-            "stick/left/active": leftStick.active,
-            "stick/right/x": rightStick.x,
-            "stick/right/y": rightStick.y,
-            "stick/right/active": rightStick.active,
-            "touchpad/x": touchPad.x,
-            "touchpad/y": touchPad.y,
-            "touchpad/active": touchPad.active,
-            "shoulder/left": leftShoulder,
-            "shoulder/right": rightShoulder,    
-            "trigger/left": leftTrigger,
-            "trigger/right": rightTrigger,
-        ]
+        var values: [String: Any] = [:]
+        for (address, _) in Self.defaultActive {
+            switch value(for: address) {
+            case .bool(let value):
+                values[address] = value
+            case .float(let value):
+                values[address] = value
+            case nil:
+                continue
+            }
+        }
+        return values
     }
 }
 
