@@ -72,13 +72,15 @@ public final class DDMicrophoneEngine: NSObject, DDEngine, @unchecked Sendable {
         guard recorder?.prepareToRecord() == true else { return }
         recorder?.isMeteringEnabled = true
         recorder?.record()
-        timer = .scheduledTimer(withTimeInterval: 0.01, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 1.0 / 120, repeats: true) { [weak self] _ in
             guard let self else { return }
             recorder?.updateMeters()
             guard let averagePower: Float = recorder?.averagePower(forChannel: 0) else { return }
             guard let peakPower: Float = recorder?.peakPower(forChannel: 0) else { return }
             audio.send(DDAudio(averagePower: CGFloat(averagePower), peakPower: CGFloat(peakPower)))
         }
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
     }
     
     public func stopUpdating() {
